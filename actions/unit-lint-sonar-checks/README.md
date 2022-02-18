@@ -1,6 +1,6 @@
 # `unit-lint-sonar-checks` - **Github Action**
 
-This action checks out the commit, sets up Node, runs unit tests, linter and sonar checks.
+This action checks out the commit, sets up Node (14), runs unit tests, linter and sonar checks.
 
 ## Input
 

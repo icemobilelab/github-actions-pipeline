@@ -1,4 +1,4 @@
-name: '`'
+name: 'Run unit, lint and sonar checks'
 inputs:
     fetch-depth:
         required: false
