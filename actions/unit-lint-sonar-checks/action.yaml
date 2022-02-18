@@ -30,9 +30,9 @@ runs:
           token: ${{ inputs.pat-token }}
 
     - name: Set up Node
-        uses: actions/setup-node@v2
-        with:
-            node-version: 14
+      uses: actions/setup-node@v2
+      with:
+          node-version: 14
 
     - name: Reconfigure Git authentication
       run: |
