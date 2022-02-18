@@ -4,10 +4,20 @@ inputs:
         required: false
         description: 'Number of commits to fetch during checkout. 0 indicates all history for all branches and tags.'
         default: '1'
-    token:
+    ref:  
+        required: false
+        description: 'The branch, tag or SHA to checkout. When checking out the repository that triggered a workflow, this defaults to the reference or SHA for that event.  Otherwise, uses the default branch.'
+        default: '1'  
+    pat-token:
         required: false
         description: 'Personal access token (PAT) used to fetch the repository.'
-        default: ${{ secrets.GITHUB_TOKEN }}
+        default: ${{ github.token }}
+    icemobile-pat-token:
+        required: false
+        description: 'PAT with access to all internal IceMobile repos'
+    sonar-token:
+        required: true
+        description: 'Pass ${{ secrets.SONAR_TOKEN }} here'
 
 runs:
   using: 'composite'
@@ -17,7 +27,8 @@ runs:
       uses: actions/checkout@v2
       with:
           fetch-depth: ${{ inputs.fetch-depth }}
-          token: ${{ inputs.token }}
+          fetch-depth: ${{ inputs.ref }}
+          token: ${{ inputs.pat-token }}
 
     - name: Set up Node
         uses: actions/setup-node@v2
@@ -26,8 +37,8 @@ runs:
 
     - name: Reconfigure Git authentication
       run: |
-        git config --global --add url."https://${{ secrets.IM_CI_GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
-        git config --global --add url."https://${{ secrets.IM_CI_GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+        git config --global --add url."https://${{ inputs.icemobile-pat-token }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+        git config --global --add url."https://${{ inputs.icemobile-pat-token }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
     - name: Run npm ci
       run: npm ci
@@ -46,5 +57,5 @@ runs:
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@v1.6
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+        GITHUB_TOKEN: ${{ github.token }}
+        SONAR_TOKEN: ${{ inputs.sonar-token }} 
