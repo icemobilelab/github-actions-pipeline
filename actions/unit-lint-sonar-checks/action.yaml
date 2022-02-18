@@ -35,17 +35,21 @@ runs:
           node-version: 14
 
     - name: Reconfigure Git authentication
+      shell: bash
       run: |
         git config --global --add url."https://${{ inputs.icemobile-pat-token }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
         git config --global --add url."https://${{ inputs.icemobile-pat-token }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
     - name: Run npm ci
+      shell: bash
       run: npm ci
       
     - name: Run linter
+      shell: bash
       run: npm run lint
 
-    - name: Run unit tests  
+    - name: Run unit tests
+      shell: bash
       run: npm run unit-test
       env:
         CI: true
