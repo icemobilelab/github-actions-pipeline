@@ -1,0 +1,50 @@
+name: 'Run unit, lint and sonar checks'
+inputs:
+    fetch-depth:
+        required: false
+        description: 'Number of commits to fetch during checkout. 0 indicates all history for all branches and tags.'
+        default: '1'
+    token:
+        required: false
+        description: 'Personal access token (PAT) used to fetch the repository.'
+        default: ${{ secrets.GITHUB_TOKEN }}
+
+runs:
+  using: 'composite'
+  steps:
+  
+    - name: Checkout the commit
+      uses: actions/checkout@v2
+      with:
+          fetch-depth: ${{ inputs.fetch-depth }}
+          token: ${{ inputs.token }}
+
+    - name: Set up Node
+        uses: actions/setup-node@v2
+        with:
+            node-version: 14
+
+    - name: Reconfigure Git authentication
+      run: |
+        git config --global --add url."https://${{ secrets.IM_CI_GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+        git config --global --add url."https://${{ secrets.IM_CI_GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+
+    - name: Run npm ci
+      run: npm ci
+      
+    - name: Run linter
+      run: npm run lint
+
+    - name: Run unit tests  
+      run: npm run unit-test
+      env:
+        CI: true
+
+    # Run Sonar check as a step and not as a separate job
+    # in order to collect coverage data generated on previous (npm run test) step.
+    # To see more sonar settings, have a look at sonar-project.properties file
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v1.6
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
