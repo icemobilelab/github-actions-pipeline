@@ -17,6 +17,10 @@ inputs:
     sonar-token:
         required: true
         description: 'Pass secrets.SONAR_TOKEN here'
+    sonar-sources:
+        required: false
+        description: Sourse folder to scan
+        default: 'lib/util'
 
 runs:
   using: 'composite'
@@ -52,6 +56,25 @@ runs:
       run: npm run unit-test
       env:
         CI: true
+
+    - name: Create sonar properties file
+      shell: bash
+      run: |
+        cat > sonar-project.properties << ENDOFFILE
+        sonar.eslint.eslintconfigpath=.eslintrc
+        sonar.host.url=https://sonarcloud.io
+        sonar.inclusions=**/*.js
+        sonar.javascript.lcov.reportPaths=coverage/lcov.info
+        sonar.projectKey=${{ github.repository }}
+        sonar.sourceEncoding=UTF-8
+        sonar.sources=${{ inputs.sonar-sources }}
+        sonar.organization=icemobilelab
+        ENDOFFILE
+
+    - name: Read file contents
+      shell: bash
+      run: cat sonar-project.properties
+        
 
     # Run Sonar check as a step and not as a separate job
     # in order to collect coverage data generated on previous (npm run test) step.
