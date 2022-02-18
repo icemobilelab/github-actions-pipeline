@@ -29,5 +29,5 @@ jobs:
               with:
                   fetch-depth: '1'
                   icemobile-pat-token: ${{ secrets.IM_CI_GITHUB_TOKEN }}
-				  sonar-token: ${{ secrets.SONAR_TOKEN }}
+                  sonar-token: ${{ secrets.SONAR_TOKEN }}
 ```
