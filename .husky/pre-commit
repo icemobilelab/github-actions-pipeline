@@ -1,0 +1,51 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+set -e;
+
+_debug() {
+    if [ "$HUSKY_DEBUG" = "1" ]; then
+        echo "$@";
+    fi
+}
+
+_error() {
+    echo "It looks like you forgot to run \`npm run build\` or stage one or more action dist files (\`actions/*/dist/index.js\`)."
+    echo
+    echo "Run \`npm run build\`, stage your changes, and try again."
+    echo
+    echo "If you think this is a mistake, commit your changes with the \`--no-verify\` flag."
+    echo
+    exit 1;
+}
+
+statflags=
+case $(uname) in
+    "Darwin")
+        statflags='-f %m'
+        ;;
+    *)
+        statflags='-c %Y'
+        ;;
+esac
+
+git status -s | awk '/^M. actions\/[^\/]+\/src/ {print $2}' \
+    |while read -r modified; do
+        _debug "$modified is modified and staged"
+        action="$(dirname "$(dirname "$modified")")"
+        escaped_action="$(echo "$action" | sed 's,/,\\/,g')"
+        dist_file="$(git status -s | awk "/^M  ${escaped_action}\/dist\/index\.js/ {print \$2}")"
+        _debug "Dist: $dist_file"
+        if [ -z "$dist_file" ]; then
+            _error
+        fi
+        dist_mtime="$(stat $statflags "$dist_file")"
+        src_mtime="$(stat $statflags "$modified")"
+
+        _debug "dist: $dist_mtime"
+        _debug " src: $src_mtime"
+
+        if [ "$src_mtime" -gt "$dist_mtime" ]; then
+            _error
+        fi
+    done
