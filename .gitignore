@@ -1,0 +1,23 @@
+/node_modules
+
+*.json
+!/package-lock.json
+!/package.json
+
+*.yml
+*.yaml
+
+# Workflows and actions
+!/.github/workflows/**/*.yaml
+!/.github/workflows/**/*.yml
+!/actions/**/*.yaml
+!/actions/**/*.yml
+
+# 3scale config
+.3scalerc
+.3scalerc.yaml
+.3scalerc.yml
+
+# act stuff
+.secrets
+.actrc

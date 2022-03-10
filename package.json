@@ -1,0 +1,35 @@
+{
+    "name": "github-actions-pipeline",
+    "version": "1.0.0",
+    "description": "Github actions and workflows for IceMobile CI/CD pipelines",
+    "dependencies": {
+        "@actions/core": "^1.6.0",
+        "@actions/exec": "^1.1.0",
+        "@apidevtools/swagger-parser": "^10.0.3"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "find actions/* -type dir -name src -execdir npx ncc build -m src/index.js \\;"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/icemobilelab/github-actions-pipeline.git"
+    },
+    "homepage": "https://github.com/icemobilelab/github-actions-pipeline#readme",
+    "devDependencies": {
+        "@vercel/ncc": "^0.33.3",
+        "husky": "^7.0.4"
+    },
+    "threeScale": {
+        "systemName": "github-actions",
+        "publicBasePath": "/github/actions",
+        "clusters": [
+            {
+                "name": "ARO_ACC_WESTEUROPE"
+            },
+            {
+                "name": "ARO_PRD_WESTEUROPE"
+            }
+        ]
+    }
+}
