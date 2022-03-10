@@ -9,7 +9,7 @@
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "find actions/* -type dir -name src -execdir npx ncc build src/index.js \\;"
+        "build": "find actions/* -type dir -name src -execdir npx ncc build -m src/index.js \\;"
     },
     "repository": {
         "type": "git",
