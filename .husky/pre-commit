@@ -1,7 +1,9 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env bash
 
 set -e;
+
+# shellcheck source=/dev/null
+. "$(dirname "$0")/_/husky.sh"
 
 _debug() {
     if [ "$HUSKY_DEBUG" = "1" ]; then
@@ -22,25 +24,25 @@ _error() {
 statflags=
 case $(uname) in
     "Darwin")
-        statflags='-f %m'
+        statflags=(-f %m)
         ;;
     *)
-        statflags='-c %Y'
+        statflags=(-c %Y)
         ;;
 esac
 
-git status -s | awk '/^M. actions\/[^\/]+\/src/ {print $2}' \
+git status -s | awk '/^[MA]. actions\/[^\/]+\/src/ {print $2}' \
     |while read -r modified; do
         _debug "$modified is modified and staged"
-        action="$(dirname "$(dirname "$modified")")"
-        escaped_action="$(echo "$action" | sed 's,/,\\/,g')"
-        dist_file="$(git status -s | awk "/^M  ${escaped_action}\/dist\/index\.js/ {print \$2}")"
+        action="$(awk -F/ '{print $1 "/" $2}'<<<"$modified")"
+        # This weird syntax escapes all `/` as `\/` ------vvvvvvvv
+        dist_file="$(git status -s | awk "/^[MA]  ${action//\//\\/}\/dist\/index\.js/ {print \$2}")"
         _debug "Dist: $dist_file"
         if [ -z "$dist_file" ]; then
             _error
         fi
-        dist_mtime="$(stat $statflags "$dist_file")"
-        src_mtime="$(stat $statflags "$modified")"
+        dist_mtime="$(stat "${statflags[@]}" "$dist_file")"
+        src_mtime="$(stat "${statflags[@]}" "$modified")"
 
         _debug "dist: $dist_mtime"
         _debug " src: $src_mtime"
