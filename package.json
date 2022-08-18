@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Github actions and workflows for IceMobile CI/CD pipelines",
     "dependencies": {
-        "@actions/core": "^1.6.0",
+        "@actions/core": "^1.9.1",
         "@actions/exec": "^1.1.0",
         "@apidevtools/swagger-parser": "^10.0.3"
     },
