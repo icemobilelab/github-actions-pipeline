@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: integration-test-job
+objects:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: integration-tests-${PROJECT_NAME}
+      labels:
+        job: integration-test
+    spec:
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            job: integration-test
+        spec:
+          containers:
+          - name: integration-tests
+            image: image-registry.openshift-image-registry.svc:5000/${TESTING_NAMESPACE}/${PROJECT_NAME}:${SERVICE_TAG}
+            env:
+              - name: TESTING_NAMESPACE
+                value: ${TESTING_NAMESPACE}
+            command:
+              - sh
+              - -c
+              - |
+                npm install --ignore-scripts --production=false
+
+                env -i \
+                  PATH="$PATH" \
+                  TESTING_NAMESPACE="$TESTING_NAMESPACE" \
+                  npm run integration-test
+          restartPolicy: Never
+parameters:
+  - name: TESTING_NAMESPACE
+    displayName: Testing namespace
+    description: Namespace where testing is happening
+    required: true
+  - name: PROJECT_NAME
+    displayName: Project name
+    description: Name of the project being tested
+    required: true
+  - name: SERVICE_TAG
+    displayName: Service tag
+    description: The image tag for the project being tested
+    required: true

@@ -1,0 +1,13 @@
+name: Collect pod logs
+description: >
+  Collects logs from all the pods in the specified namespace and outputs them all to a directory. Each pod's logs
+  will be output to a file named <pod-name>.txt within the directory.
+inputs:
+  namespace:
+    description: The kubernetes namespace from which to collect logs
+outputs:
+  output-directory:
+    description: The directory where all pod logs are output
+runs:
+  using: node16
+  main: dist/index.mjs

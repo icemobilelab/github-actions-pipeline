@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Template
+metadata:
+  ? creationTimestamp
+  name: loyalty-mysql-template
+objects:
+  - apiVersion: v1
+    data:
+      banner.adminPassword: loyalty_db
+      banner.adminUser: root
+      banner.database: banner
+      banner.password: loyalty_db
+      banner.user: root
+      bpo.database: bonus_point_offers
+      bpo.password: 6fa691d2c07bea6ae78b7022c80e9d20
+      bpo.user: bpo
+      cms.database: cms
+      cms.password: loyalty_db
+      cms.user: root
+      core.database: blpcore
+      core.password: blp_mysql
+      core.user: blp_mysql
+      gifting.database: gifting
+      gifting.password: 6fa691d2c07bea6ae78b7022c80e9d20
+      gifting.user: gifting
+      host: loyalty-database-v4
+      identity.database: identity
+      identity.password: 6fa691d2c07bea6ae78b7022c80e9d20
+      identity.user: identity
+      oauth2.database: authentication
+      oauth2.password: 6fa691d2c07bea6ae78b7022c80e9d20
+      oauth2.user: authentication
+      saigoncoop-vouchers.database: vouchers
+      saigoncoop-vouchers.password: password
+      saigoncoop-vouchers.user: vouchers
+      port: '3306'
+      sslCertificatePath: ''
+      userSuffix: ''
+    kind: ConfigMap
+    metadata:
+      name: loyalty-mysql
+  - apiVersion: v1
+    data:
+      banner.adminPassword: bG95YWx0eV9kYg==
+      banner.adminUser: cm9vdA==
+      banner.database: YmFubmVy
+      banner.password: bG95YWx0eV9kYg==
+      banner.user: cm9vdA==
+      bpo.database: Ym9udXNfcG9pbnRfb2ZmZXJz
+      bpo.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+      bpo.user: YnBv
+      cms.database: Y21z
+      cms.password: bG95YWx0eV9kYg==
+      cms.user: cm9vdA==
+      gifting.database: Z2lmdGluZw==
+      gifting.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+      gifting.user: Z2lmdGluZw==
+      host: bG95YWx0eS1kYXRhYmFzZS12NA==
+      saigoncoop-vouchers.database: dm91Y2hlcnM=
+      saigoncoop-vouchers.password: cGFzc3dvcmQ=
+      saigoncoop-vouchers.user: dm91Y2hlcnM=
+      port: MzMwNg==
+      sslCertificatePath:
+      userSuffix:
+    kind: Secret
+    metadata:
+      name: loyalty-mysql
+    type: Opaque

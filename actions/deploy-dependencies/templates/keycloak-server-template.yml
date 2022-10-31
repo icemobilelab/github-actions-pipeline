@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: keycloak-server
+objects:
+  - apiVersion: v1
+    data:
+      frontendUrl: "${FRONTEND_URL}"
+      dbVendor: "${DB_VENDOR}"
+    kind: ConfigMap
+    metadata:
+      name: keycloak-server
+parameters:
+  - name: FRONTEND_URL
+    displayName: Frontend URL
+    description: Set the frontend URL for the realm. Use in combination with the default hostname provider to override the base URL for frontend requests for a specific realm.
+    required: true
+    value: http://keycloak:8080/auth
+  - name: DB_VENDOR
+    displayName: Database Vendor
+    description: Directly specify the database vendor. Supported values are H2, POSTGRES, MYSQL, MARIADB, ORACLE and MSSQL.
+    required: true
+    value: H2

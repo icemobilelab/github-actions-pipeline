@@ -1,0 +1,5 @@
+name: Build Docker image
+description: Builds and tags a new Docker image from the project sources
+runs:
+  using: node16
+  main: dist/index.mjs

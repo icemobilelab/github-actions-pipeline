@@ -1,0 +1,8 @@
+name: Run linter
+description: Runs the configured linter over your code
+runs:
+  using: 'composite'
+  steps:
+    - name: Run linter
+      shell: bash
+      run: npm run lint

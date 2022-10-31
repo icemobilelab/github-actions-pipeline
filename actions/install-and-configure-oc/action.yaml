@@ -1,0 +1,20 @@
+name: OpenShift CLI Setup
+description: Installs and configures the OpenShift CLI (oc)
+inputs:
+  openshift-server-api-url:
+    description: The URL to the OpenShift cluster's API
+    required: true
+  openshift-auth-token:
+    description: The authentication token to use
+runs:
+  using: composite
+  steps:
+    - name: Install oc
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        oc: '4'
+    - name: Log into the cluster
+      uses: icemobilelab/github-actions-pipeline/actions/login-to-cluster@v1
+      with:
+        openshift-server-api-url: ${{ inputs.openshift-server-api-url }}
+        openshift-auth-token: ${{ inputs.openshift-auth-token }}

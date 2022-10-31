@@ -1,0 +1,31 @@
+name: sdsads
+description: asd
+inputs:
+  ansible-vault-key:
+    description: The ansible vault decryption key
+    required: true
+outputs:
+  ansible-vault-password-file:
+    description: The path to the Ansible vault password file
+    value: /tmp/.ansible-vault-key
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@v3
+      id: ansible-cache
+      with:
+        path: |
+          /usr/local/lib/python3*/dist-packages
+          /usr/local/bin/ansible-vault
+        key: ansible-vault
+    - name: Install Ansible
+      shell: bash
+      if: steps.ansible-cache.outputs.cache-hit != 'true'
+      run: |
+        curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+        python3 get-pip.py
+        python3 -m pip install ansible
+    - name: Configure Ansible Vault
+      shell: bash
+      run: |
+        echo -n "${{ inputs.ansible-vault-key }}" > /tmp/.ansible-vault-key

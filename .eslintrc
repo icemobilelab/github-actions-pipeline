@@ -1,0 +1,23 @@
+{
+    "extends": [
+        "plugin:import/recommended",
+        "@icemobile/eslint-config-backend"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2022 // Required for async context in modules and instance class fields
+    },
+    "ignorePatterns": [
+        "/actions/**/dist",
+        "/test2"
+    ],
+    "rules": {
+        "import/extensions": ["error", "ignorePackages"],
+        "import/no-commonjs": "off",
+        "import/no-named-as-default-member": "off"
+        // "import/no-unresolved": [ "error", {
+        //     "ignore": [
+        //         "^got$" // The import plugin doesn't play well with modules whose package.json doesn't include a "main" field, like `got`. See https://github.com/import-js/eslint-plugin-import/issues/2132
+        //     ]
+        // }]
+    }
+}

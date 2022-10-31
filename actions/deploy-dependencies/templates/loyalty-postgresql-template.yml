@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp:
+  name: loyalty-postgresql
+  labels:
+    app: loyalty-postgresql
+objects:
+- apiVersion: v1
+  data:
+    bcs.dbname: bcs
+    bcs.dbpass: 6fa691d2c07bea6ae78b7022c80e9d20
+    bcs.dbuser: bcs
+    blp.dbname: blp_core
+    blp.dbpass: 6fa691d2c07bea6ae78b7022c80e9d20
+    blp.dbuser: blp
+    dbname: loyalty
+    gifting.user: gifting
+    gifting.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    gifting.dbname: gifting
+    host: loyalty-postgres-v4
+    keycloak.database: keycloak
+    keycloak.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    keycloak.user: keycloak
+    las.dbname: las
+    las.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    las.user: las
+    lis.dbname: lis
+    lis.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    lis.user: lis
+    lus.dbname: lus
+    lus.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    lus.user: lus
+    magnit_minigames.dbname: magnit_minigames
+    magnit_minigames.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    magnit_minigames.user: magnit_minigames
+    minigames.dbname: minigames
+    minigames.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    minigames.user: minigames
+    sis.dbname: sis
+    sis.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    sis.user: sis
+    sqladmin.pass: loyalty_db
+    sqladmin.user: loyalty
+    cms.adminpassword: loyalty_db
+    cms.adminuser: postgres
+    ssl.supported: "false"
+    sslCertificatePath: ""
+    userSuffix: ""
+    whackarabbit.dbname: whackarabbit
+    whackarabbit.password: 6fa691d2c07bea6ae78b7022c80e9d20
+    whackarabbit.user: whackarabbit
+  kind: ConfigMap
+  metadata:
+    name: loyalty-postgresql
+- apiVersion: v1
+  data:
+    bcs.dbname: YmNz
+    bcs.dbpass: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    bcs.dbuser: YmNz
+    blp.dbname: YmxwX2NvcmU=
+    blp.dbpass: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    blp.dbuser: Ymxw
+    dbname: bG95YWx0eQ==
+    gifting.user: Z2lmdGluZw==
+    gifting.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    gifting.dbname: Z2lmdGluZw==
+    host: bG95YWx0eS1wb3N0Z3Jlcy12NA==
+    keycloak.database: a2V5Y2xvYWs=
+    keycloak.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    keycloak.user: a2V5Y2xvYWs=
+    las.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    las.user: bGFz
+    las.dbname: bGFz
+    lis.dbname: bGlz
+    lis.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    lis.user: bGlz
+    lus.dbname: bHVz
+    lus.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    lus.user: bHVz
+    magnit_minigames.dbname: bWFnbml0X21pbmlnYW1lcw==
+    magnit_minigames.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    magnit_minigames.user: bWFnbml0X21pbmlnYW1lcw==
+    minigames.dbname: bWluaWdhbWVz
+    minigames.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    minigames.user: bWluaWdhbWVz
+    sis.dbname: c2lz
+    sis.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    sis.user: c2lz
+    sqladmin.pass: bG95YWx0eV9kYg==
+    sqladmin.user: bG95YWx0eQ==
+    cms.adminpassword: bG95YWx0eV9kYg==
+    cms.adminuser: cG9zdGdyZXM=
+    ssl.supported: ZmFsc2U=
+    sslCertificatePath:
+    userSuffix:
+    whackarabbit.dbname: d2hhY2thcmFiYml0
+    whackarabbit.password: NmZhNjkxZDJjMDdiZWE2YWU3OGI3MDIyYzgwZTlkMjA=
+    whackarabbit.user: d2hhY2thcmFiYml0
+  kind: Secret
+  metadata:
+    name: loyalty-postgresql
+  type: Opaque
+- apiVersion: v1
+  data:
+    ssl.ca: |-
+      -----BEGIN CERTIFICATE-----
+      MIIDdzCCAl+gAwIBAgIEAgAAuTANBgkqhkiG9w0BAQUFADBaMQswCQYDVQQGEwJJ
+      RTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJlclRydXN0MSIwIAYD
+      VQQDExlCYWx0aW1vcmUgQ3liZXJUcnVzdCBSb290MB4XDTAwMDUxMjE4NDYwMFoX
+      DTI1MDUxMjIzNTkwMFowWjELMAkGA1UEBhMCSUUxEjAQBgNVBAoTCUJhbHRpbW9y
+      ZTETMBEGA1UECxMKQ3liZXJUcnVzdDEiMCAGA1UEAxMZQmFsdGltb3JlIEN5YmVy
+      VHJ1c3QgUm9vdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKMEuyKr
+      mD1X6CZymrV51Cni4eiVgLGw41uOKymaZN+hXe2wCQVt2yguzmKiYv60iNoS6zjr
+      IZ3AQSsBUnuId9Mcj8e6uYi1agnnc+gRQKfRzMpijS3ljwumUNKoUMMo6vWrJYeK
+      mpYcqWe4PwzV9/lSEy/CG9VwcPCPwBLKBsua4dnKM3p31vjsufFoREJIE9LAwqSu
+      XmD+tqYF/LTdB1kC1FkYmGP1pWPgkAx9XbIGevOF6uvUA65ehD5f/xXtabz5OTZy
+      dc93Uk3zyZAsuT3lySNTPx8kmCFcB5kpvcY67Oduhjprl3RjM71oGDHweI12v/ye
+      jl0qhqdNkNwnGjkCAwEAAaNFMEMwHQYDVR0OBBYEFOWdWTCCR1jMrPoIVDaGezq1
+      BE3wMBIGA1UdEwEB/wQIMAYBAf8CAQMwDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3
+      DQEBBQUAA4IBAQCFDF2O5G9RaEIFoN27TyclhAO992T9Ldcw46QQF+vaKSm2eT92
+      9hkTI7gQCvlYpNRhcL0EYWoSihfVCr3FvDB81ukMJY2GQE/szKN+OMY3EU/t3Wgx
+      jkzSswF07r51XgdIGn9w/xZchMB5hbgF/X++ZRGjD8ACtPhSNzkE1akxehi/oCr0
+      Epn3o0WC4zxe9Z2etciefC7IpJ5OCBRLbf1wbWsaY71k5h+3zvDyny67G7fyUIhz
+      ksLi4xaNmjICq44Y3ekQEe5+NauQrz4wlHrQMz2nZQ/1/I6eYs9HRCwBXbsdtTLS
+      R9I4LtD+gdwyah617jzV/OeBHRnDJELqYzmp
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    name: postgresql-ssl-ca-key

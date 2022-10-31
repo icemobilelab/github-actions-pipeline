@@ -1,0 +1,8 @@
+name: Run Sonarqube
+description: Runs Sonarqube over your code
+runs:
+  using: 'composite'
+  steps:
+    - name: Run sonarqube
+      shell: bash
+      run: npm run sonarqube

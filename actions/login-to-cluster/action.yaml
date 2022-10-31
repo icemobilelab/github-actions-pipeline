@@ -1,0 +1,11 @@
+name: Log into OpenShift cluster
+description: Configures the OpenShift CLI (oc) to be authenticated to a specific cluster
+inputs:
+  openshift-server-api-url:
+    description: The URL to the OpenShift cluster's API
+    required: true
+  openshift-auth-token:
+    description: The authentication token to use
+runs:
+  using: node16
+  main: dist/index.mjs

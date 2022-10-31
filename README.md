@@ -22,19 +22,30 @@ npm install
 
 All new Actions should exist in the `actions` directory. Please add a `README.md` file detailing how to use your action.
 
+The special directory `actions/common` is used for storing utilities, classes, etc. that are usueful across multiple actions.
+
 In general, the folder structure should look something like this (for details on each type of action, see each section below):
 
 ```txt
 actions
-├── my-nodejs-action
+├── my-commonjs-nodejs-action
 │   ├── README.md
 │   ├── action.yaml
 │   ├── dist
-│   │   └── index.js
+│   │   └── index.cjs
 │   └── src
-│       ├── do-more-stuff.js
-│       ├── do-stuff.js
-│       └── index.js
+│       ├── do-more-stuff.cjs
+│       ├── do-stuff.cjs
+│       └── index.cjs
+├── my-esm-nodejs-action
+│   ├── README.md
+│   ├── action.yaml
+│   ├── dist
+│   │   └── index.mjs
+│   └── src
+│       ├── do-more-stuff.mjs
+│       ├── do-stuff.mjs
+│       └── index.mjs
 ├── my-docker-action
 │   ├── Dockerfile
 │   ├── README.md
@@ -80,7 +91,8 @@ runs:
 ### NodeJS Actions
 
 Per [the documentation][gha_nodejs], these need to be bundled into a single distributable
-module using [ncc][ncc]. A convenience script has been added to `package.json`, named `build`:
+module. While the GHA docs recommend using [ncc][ncc] for this, ncc has some trouble dealing with ES Modules, so
+we've opted instead for [esbuild][esbuild]. A convenience script has been added to `package.json`, named `build`:
 
 ```shell
 npm run build
@@ -112,7 +124,8 @@ runs:
   main: dist/index.js
 ```
 
-Notice the last line. By default, the build script will output a single `index.js` file to `action/<action_name>/dist/index.js`, and this is the file that your action needs to run.
+Notice the last line. By default, the build script will output a single `index.[m|c]js` file to `action/<action_name>/dist/`, and this is the file that your action needs to run. The output file's extension will depend on whether your `src/index` module is an ES Module (`.mjs`) or a CommonJS module (`.cjs` or `.js`).
 
 [gha_nodejs]: https://docs.github.com/en/actions/creating-actions/creating-a-javascript-action#commit-tag-and-push-your-action-to-github
 [ncc]: https://www.npmjs.com/package/@vercel/ncc
+[esbuild]: https://esbuild.github.io/

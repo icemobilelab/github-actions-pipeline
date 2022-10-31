@@ -1,0 +1,25 @@
+name: Cleanup Integration Test Namespace
+description: >
+  Cleans up and deletes the namespace used for integration tests. **Requires a
+  previously configured OpenShift CLI (`oc`)**
+inputs:
+  namespace:
+    description: The namespace to delete
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: Get testing namespace
+      if: ${{ !inputs.namespace }}
+      id: testing-ns
+      uses: icemobilelab/github-actions-pipeline/actions/get-testing-namespace@v1
+    - name: Create NS
+      shell: bash
+      run: |
+        _ns="${{ inputs.namespace || steps.testing-ns.outputs.testing-namespace }}"
+
+        oc adm policy \
+          remove-role-from-group system:image-puller \
+          "system:serviceaccounts:${_ns}" -n cicd || true
+
+        oc delete project "${_ns}" --wait || true
