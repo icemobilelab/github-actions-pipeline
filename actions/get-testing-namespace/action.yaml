@@ -1,0 +1,8 @@
+name: Get testing namespace
+description: Outputs the kubernetes namespace used for testing
+outputs:
+  testing-namespace:
+    description: The kubernetes namespace used for testing
+runs:
+  using: node16
+  main: dist/index.mjs

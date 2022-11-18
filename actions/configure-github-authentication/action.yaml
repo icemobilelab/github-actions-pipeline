@@ -1,0 +1,14 @@
+name: Configure GitHub Authentication
+description: Configures git to authenticate to GitHub using personal access token (PAT)
+inputs:
+  github-pat:
+    description: The GitHub personal access token (PAT) to use
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Configure git authentication
+      shell: bash
+      run: |
+        git config --global --add url."https://${{ inputs.github-pat }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+        git config --global --add url."https://${{ inputs.github-pat }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com:"

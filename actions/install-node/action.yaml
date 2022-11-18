@@ -1,0 +1,14 @@
+name: Install node
+description: Installs the proper node version based on an existing .nvmrc file
+runs:
+  using: composite
+  steps:
+    - name: Read .nvmrc
+      id: nvm
+      shell: bash
+      run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+    - name: Set up Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
+        cache: 'npm'

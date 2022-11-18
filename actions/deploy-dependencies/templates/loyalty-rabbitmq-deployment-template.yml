@@ -1,0 +1,109 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: loyalty-rabbitmq
+  labels:
+    app: loyalty-rabbitmq
+objects:
+- apiVersion: v1
+  data:
+    password: spring
+    username: spring
+  kind: ConfigMap
+  metadata:
+    name: loyalty-rabbitmq-credentials
+- apiVersion: v1
+  data:
+    password: c3ByaW5n
+    username: c3ByaW5n
+  kind: Secret
+  metadata:
+    name: loyalty-rabbitmq-credentials
+  type: Opaque
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    generation: 1
+    name: loyalty-rabbitmq
+  spec:
+    replicas: 1
+    selector:
+      app: loyalty-rabbitmq
+    strategy:
+      activeDeadlineSeconds: 21600
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: loyalty-rabbitmq
+      spec:
+        containers:
+        - env:
+          - name: RABBITMQ_DEFAULT_USER
+            valueFrom:
+              configMapKeyRef:
+                key: username
+                name: loyalty-rabbitmq-credentials
+          - name: RABBITMQ_DEFAULT_PASS
+            valueFrom:
+              configMapKeyRef:
+                key: password
+                name: loyalty-rabbitmq-credentials
+          image: rabbitmq:3.8-management-alpine
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - rabbitmqctl
+                - status
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: loyalty-rabbitmq
+          ports:
+            - containerPort: 5672
+              name: amqp
+              protocol: TCP
+            - containerPort: 15672
+              name: management
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: "loyalty-rabbitmq"
+    name: "loyalty-rabbitmq"
+  spec:
+    ports:
+    - name: 5672-tcp
+      port: 5672
+      protocol: TCP
+      targetPort: 5672
+    - name: 15672-tcp
+      port: 15672
+      protocol: TCP
+      targetPort: 15672
+    selector:
+      app: "loyalty-rabbitmq"
+    sessionAffinity: None
+    type: ClusterIP

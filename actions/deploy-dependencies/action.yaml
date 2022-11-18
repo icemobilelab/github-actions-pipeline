@@ -1,0 +1,12 @@
+name: Deploy dependencies
+description: Deploys the current project's dependencies to OpenShift
+inputs:
+  namespace:
+    description: The namespace to which to deploy the dependencies
+    required: true
+  ansible-vault-password-file:
+    description: The path to the ansible vault password file
+    required: true
+runs:
+  using: node16
+  main: dist/index.mjs

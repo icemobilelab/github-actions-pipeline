@@ -1,0 +1,25 @@
+name: Unit Tests and Coverage Check
+description: Run unit tests and optionally check test coverage
+inputs:
+    minimum-code-coverage:
+        required: false
+        description: The minimum percentage of code that must be covered to succeed. If unset, coverage isn't checked
+runs:
+  using: 'composite'
+  steps:
+    - name: Run unit tests
+      shell: bash
+      run: npm run unit-test -- --reporter mochawesome
+    - name: Check coverage
+      if: ${{ !!inputs.minimum-code-coverage }}
+      shell: bash
+      run: |
+        _tool=''
+        if command npm ls c8 2>&1 >/dev/null; then
+          _tool=c8
+        else
+          _tool=nyc
+        fi
+
+        npx --prefer-offline --no-yes \
+          $_tool report --lines ${{ inputs.minimum-code-coverage }} --branches ${{ inputs.minimum-code-coverage }} --check-coverage

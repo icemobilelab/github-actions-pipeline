@@ -5,11 +5,22 @@
     "dependencies": {
         "@actions/core": "^1.6.0",
         "@actions/exec": "^1.1.0",
+        "@actions/github": "^5.1.1",
+        "@actions/io": "^1.1.2",
+        "@actions/tool-cache": "^2.0.1",
         "@apidevtools/swagger-parser": "^10.0.3"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "find actions/* -type dir -name src -execdir npx ncc build -m src/index.js \\;"
+        "build_old": "find actions/* -name dist -type d -print -execdir rm -r dist \\; ; find actions/* -path actions/\\*/src\\* -type f -name index.*js -execdir npx ncc build -m -o ../dist {} \\;",
+        "build": "node scripts/build.mjs",
+        "lint": "eslint --ext .js,.mjs,.cjs actions",
+        "prepare": "husky install",
+        "_cache-server": "sh scripts/cache-server.sh",
+        "build-cache-server": "npm run _cache-server -- build",
+        "start-cache-server": "npm run _cache-server -- start",
+        "stop-cache-server": "npm run _cache-server -- stop",
+        "restart-cache-server": "npm run _cache-server -- restart"
     },
     "repository": {
         "type": "git",
@@ -17,19 +28,14 @@
     },
     "homepage": "https://github.com/icemobilelab/github-actions-pipeline#readme",
     "devDependencies": {
-        "@vercel/ncc": "^0.33.3",
-        "husky": "^7.0.4"
-    },
-    "threeScale": {
-        "systemName": "github-actions",
-        "publicBasePath": "/github/actions",
-        "clusters": [
-            {
-                "name": "ARO_ACC_WESTEUROPE"
-            },
-            {
-                "name": "ARO_PRD_WESTEUROPE"
-            }
-        ]
+        "@icemobile/eslint-config-backend": "^1.1.0",
+        "@vercel/ncc": "^0.34.0",
+        "chalk": "^5.1.2",
+        "esbuild": "^0.15.13",
+        "eslint": "^8.26.0",
+        "eslint-plugin-import": "^2.26.0",
+        "glob": "^8.0.3",
+        "husky": "^8.0.1",
+        "rimraf": "^3.0.2"
     }
 }

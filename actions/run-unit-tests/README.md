@@ -1,8 +1,8 @@
-# `unit-lint-sonar-checks` - **Github Action**
+# `run-unit-tests` - **Github Action**
 
-This action runs unit tests, linter and sonarqube checks.
+This action runs unit tests and optionally checks test coverage
 
-## Input
+## Inputs
 
 | Name                    | Required  | Description                                                                                      |
 | ----------------------- | --------- | ------------------------------------------------------------------------------------------------ |
@@ -11,14 +11,14 @@ This action runs unit tests, linter and sonarqube checks.
 ## Example Workflow File
 
 ```yaml
-name: Run unit tests, lint and sonarqube checks
+name: Run unit tests
 on: [pull_request]
 jobs:
-  run-tests-and-checks:
+  run-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Run unit tests, lint and sonarqube checks
-        uses: icemobilelab/github-actions-pipeline/actions/unit-lint-sonar-checks@main
+      - name: Run unit tests
+        uses: icemobilelab/github-actions-pipeline/actions/run-unit-tests@v1
         with:
           minimum-code-coverage: 90
 ```

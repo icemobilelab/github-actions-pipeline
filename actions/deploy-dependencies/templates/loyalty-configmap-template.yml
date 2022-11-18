@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Template
+metadata:
+  ? creationTimestamp
+  name: loyalty-configmap
+objects:
+  - apiVersion: v1
+    data:
+      common.environment: "${ENVIRONMENT}"
+      common.loglevel: debug
+      common.loglevel.jvm: DEBUG
+      common.namespace: "${NAMESPACE}"
+      common.cbiExchange: dev.cbiExchange
+      common.rabbitMQHost: loyalty-rabbitmq
+    kind: ConfigMap
+    metadata:
+      name: loyalty-configmap
+parameters:
+  - name: NAMESPACE
+    displayName: Namespace
+    description: The OpenShift Namespace used for testing.
+    required: true
+  - name: ENVIRONMENT
+    displayName: Environment
+    description: The environment used for testing
+    required: true

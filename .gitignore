@@ -12,6 +12,8 @@
 !/.github/workflows/**/*.yml
 !/actions/**/*.yaml
 !/actions/**/*.yml
+!/workflow-templates/**/*.yaml
+!/workflow-templates/**/*.yml
 
 # 3scale config
 .3scalerc

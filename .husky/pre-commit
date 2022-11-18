@@ -11,15 +11,46 @@ _debug() {
     fi
 }
 
+_reset() {
+    echo "\033[0m"
+}
+
+_bold() {
+    echo "\033[1m";
+}
+
+_white() {
+    echo "\033[m";
+}
+
+_green() {
+    echo "\033[32m"
+}
+
+_blue() {
+    echo "\033[34m"
+}
+
+
 _error() {
-    echo "It looks like you forgot to run \`npm run build\` or stage one or more action dist files (\`actions/*/dist/index.js\`)."
+    echo "It looks like you forgot to run \`npm run build\` or stage one or more action dist files (\`actions/*/dist/index.js\`):"
     echo
-    echo "Run \`npm run build\`, stage your changes, and try again."
+    if [ -z "$2" ]; then
+        echo "$(_bold)Source file $(_blue)$1 $(_white)$(_bold)is newer than dist file, or dist" \
+            "file was not added (\`git add ...\`).$(_reset)"
+    else
+        echo "$(_bold)Source file $(_blue)$1 $(_white)$(_bold)is newer than dist file $(_green)$2)$(_reset)"
+    fi
     echo
-    echo "If you think this is a mistake, commit your changes with the \`--no-verify\` flag."
-    echo
+    echo "Run \`npm run build\`, stage your changes, and try again." \
+        "If this error persists, and you're 100% sure nothing is broken, you can commit your changes" \
+        "with the \`--no-verify\` flag. This can happen if you made changes to source files that" \
+        "result in the same minified output as before (e.g. reformatted, removed comments)." \
+
     exit 1;
 }
+
+npm run lint
 
 statflags=
 case $(uname) in
@@ -36,10 +67,10 @@ git status -s | awk '/^[MA]. actions\/[^\/]+\/src/ {print $2}' \
         _debug "$modified is modified and staged"
         action="$(awk -F/ '{print $1 "/" $2}'<<<"$modified")"
         # This weird syntax escapes all `/` as `\/` ------vvvvvvvv
-        dist_file="$(git status -s | awk "/^[MA]  ${action//\//\\/}\/dist\/index\.js/ {print \$2}")"
+        dist_file="$(git status -s | awk "/^[MA]  ${action//\//\\/}\/dist\/index\.[mc]?js/ {print \$2}")"
         _debug "Dist: $dist_file"
         if [ -z "$dist_file" ]; then
-            _error
+            _error "$modified" "$dist_file"
         fi
         dist_mtime="$(stat "${statflags[@]}" "$dist_file")"
         src_mtime="$(stat "${statflags[@]}" "$modified")"
@@ -48,6 +79,6 @@ git status -s | awk '/^[MA]. actions\/[^\/]+\/src/ {print $2}' \
         _debug " src: $src_mtime"
 
         if [ "$src_mtime" -gt "$dist_mtime" ]; then
-            _error
+            _error "$modified" "$dist_file"
         fi
     done

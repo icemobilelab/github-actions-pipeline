@@ -1,0 +1,13 @@
+on:
+  push:
+    branches:
+      - main
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tag commit
+        shell: bash
+        run: |
+          git tag -f v1
+          git push --no-verify -f origin :refs/tags/v1

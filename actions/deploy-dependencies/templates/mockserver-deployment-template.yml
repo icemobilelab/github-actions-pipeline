@@ -1,0 +1,75 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: mockserver
+labels:
+  app: mockserver
+objects:
+  - apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
+    metadata:
+      name: mockserver
+    spec:
+      replicas: 1
+      selector:
+        app: mockserver
+      template:
+        metadata:
+          labels:
+            app: mockserver
+        spec:
+          containers:
+            - image: image-registry.openshift-image-registry.svc:5000/cicd/mockserver:5.13.2
+              imagePullPolicy: Always
+              name: mockserver
+              env:
+                - name: MOCKSERVER_LOG_LEVEL
+                  value: INFO
+                - name: MOCKSERVER_LIVENESS_HTTP_GET_PATH
+                  value: '/_health/liveness'
+              readinessProbe:
+                httpGet:
+                  path: '/_health/liveness'
+                  port: serviceport
+                initialDelaySeconds: 2
+                periodSeconds: 2
+                successThreshold: 1
+                failureThreshold: 10
+              livenessProbe:
+                httpGet:
+                  path: '/_health/liveness'
+                  port: serviceport
+                initialDelaySeconds: 10
+                periodSeconds: 5
+                successThreshold: 1
+                failureThreshold: 10
+              ports:
+                - containerPort: 1080
+                  name: serviceport
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                requests:
+                  cpu: 100m
+                  memory: 512Mi
+          terminationGracePeriodSeconds: 30
+      triggers:
+        - type: ConfigChange
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: mockserver
+      labels:
+        app: mockserver
+    spec:
+      ports:
+        - name: 8080-tcp
+          port: 8080
+          protocol: TCP
+          targetPort: serviceport
+      selector:
+        app: mockserver
+      type: ClusterIP
+parameters: []
