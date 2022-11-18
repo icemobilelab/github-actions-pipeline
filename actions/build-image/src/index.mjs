@@ -2,7 +2,7 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import * as core from '@actions/core';
 import { getExecOutput, exec } from '@actions/exec';
-import { getServiceTag, getShortCommitHash } from '../../common/util/project-info.mjs';
+import { getServiceTag, getShortCommitHash, isMainBranch } from '../../common/util/project-info.mjs';
 import * as oc from '../../common/util/oc.mjs';
 import {
     BUILD_PROJECT_NAME,
@@ -16,17 +16,12 @@ const ocArgs = [
 
 // eslint-disable-next-line no-unused-vars
 async function getGitTag() {
-    const [gitTagOutput] = await Promise.all([
-        getExecOutput('git', [
-            'describe', '--exact-match', '--tags'
-        ], {
-            ignoreReturnCode: true,
-            silent: true
-        }),
-        exec('sed', [
-            '-i""', '-e', '/type: ConfigChange/d', BUILD_TEMPLATE_PATH
-        ])
-    ]);
+    const gitTagOutput = await getExecOutput('git', [
+        'describe', '--exact-match', '--tags'
+    ], {
+        ignoreReturnCode: true,
+        silent: true
+    });
 
     return gitTagOutput.exitCode === 0 ? gitTagOutput.stdout : 'latest';
 }
@@ -36,14 +31,16 @@ async function buildImage(projectName, branchName, commitHash, serviceTag) {
 
     await startBuild(projectName);
 
-    if (branchName === 'develop' || branchName === 'master') {
+    if (isMainBranch(branchName)) {
         const imageName = `${BUILD_PROJECT_NAME}/${projectName}`;
         const releaseVersion = `v${serviceTag}`;
 
         const imageWithTag = `${imageName}:${serviceTag}`;
         await core.group(`Tag release ${serviceTag}`, async () => {
-            await oc.tagImage(imageWithTag, `${imageName}:${commitHash}`, ocArgs);
-            await oc.tagImage(imageWithTag, `${DEPLOYMENT_PROJECT_NAME}/${projectName}:${serviceTag}`, ocArgs);
+            await oc.tagImage(imageWithTag, [
+                `${imageName}:${commitHash}`,
+                `${DEPLOYMENT_PROJECT_NAME}/${projectName}:${serviceTag}`
+            ], ocArgs);
 
             await tagRelease(releaseVersion, commitHash);
         });
@@ -56,6 +53,10 @@ async function startBuild(projectName) {
 
 async function deployBuildConfig(projectName, commitHash, serviceTag) {
     await core.group('Deploy BuildConfig', async () => {
+        await exec('sed', [
+            '-i""', '-e', '/type: ConfigChange/d', BUILD_TEMPLATE_PATH
+        ]);
+
         const buildConfig = await oc.process(BUILD_TEMPLATE_PATH, {
             NAME: projectName,
             SOURCE_REPOSITORY_URL: `git@github.com:icemobilelab/${projectName}.git`,
@@ -107,7 +108,7 @@ async function run() {
     );
     const projectVersion = pkg.version.trim();
 
-    const serviceTag = getServiceTag(branchName, projectVersion);
+    const serviceTag = getServiceTag(branchName, projectVersion, commitHash);
     await buildImage(projectName, branchName, commitHash, serviceTag);
 }
 

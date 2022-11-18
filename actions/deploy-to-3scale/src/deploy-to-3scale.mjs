@@ -4,10 +4,11 @@ import { exec } from '@actions/exec';
 import { writeFile } from 'fs/promises';
 import { mergeSwagger } from './merge-swagger.mjs';
 import * as oc from '../../common/util/oc.mjs';
+import { CICD_PROJECT_NAME } from '../../common/constants.mjs';
 
 const THREESCALE_RC_PATH = '.3scalerc';
 const TOOLBOX_SECRET_NAME = '3scale-toolbox';
-const TOOLBOX_SECRET_NAMESPACE = 'cicd';
+const TOOLBOX_SECRET_NAMESPACE = CICD_PROJECT_NAME;
 const TOOLBOX_SECRET_KEY = '.3scalerc.yaml';
 
 async function downloadAndDecode3scaleToolboxConfig() {

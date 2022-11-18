@@ -39,12 +39,17 @@ async function login(server, token) {
     ]);
 }
 
-async function tagImage(image, tag, additionalArgs = []) {
+async function tagImage(image, tags, additionalArgs = []) {
     const args = [
         'tag',
         image,
-        tag,
     ];
+
+    if (Array.isArray(tags)) {
+        args.push(...tags);
+    } else {
+        args.push(tags);
+    }
 
     if (Array.isArray(additionalArgs) && additionalArgs.length > 0) {
         args.push(...additionalArgs);
@@ -114,6 +119,20 @@ async function waitForRollout(deploymentConfig, additionalArgs = []) {
         'rollout',
         'status',
         '-w',
+        `dc/${deploymentConfig}`,
+    ];
+
+    if (Array.isArray(additionalArgs) && additionalArgs.length > 0) {
+        args.push(...additionalArgs);
+    }
+
+    return _exec('oc', args);
+}
+
+async function pauseRollouts(deploymentConfig, additionalArgs = []) {
+    const args = [
+        'rollout',
+        'pause',
         `dc/${deploymentConfig}`,
     ];
 
@@ -221,6 +240,7 @@ export {
     startBuild,
     process,
     applyFromResourceDefinitionString,
+    pauseRollouts,
     waitForRollout,
     get,
     logs,

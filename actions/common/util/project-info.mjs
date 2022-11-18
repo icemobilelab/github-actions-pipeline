@@ -1,8 +1,9 @@
-function getServiceTag(branch, projectVersion) {
-    if (branch === 'develop' || branch === 'master') {
+function getServiceTag(branch, projectVersion, commitHash) {
+    if (branch === 'develop' || branch === 'master' || branch === 'main') {
         return projectVersion;
     } else {
-        return branch.toLowerCase().replace(/[ \.\/]/g, '_');
+        const sanitizedBranchName = branch.toLowerCase().replace(/[ \.\/]/g, '_');
+        return `${sanitizedBranchName}-${commitHash}`;
     }
 }
 
@@ -40,11 +41,16 @@ function getTestingNamespace(projectName) {
     return `test-${_projectName}-${shortSha}-p4vl0s7r1n9`;
 }
 
+function isMainBranch(branchName) {
+    return branchName === 'master' || branchName === 'develop' || branchName === 'main';
+}
+
 export {
     getServiceTag,
     getCurrentProjectName,
     getCurrentBranchName,
     getTestingNamespace,
     getShortCommitHash,
+    isMainBranch,
 };
 
