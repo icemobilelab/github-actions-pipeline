@@ -70,11 +70,11 @@ async function deployBuildConfig(projectName, commitHash, serviceTag) {
 
 async function tagRelease(releaseVersion, commitHash) {
     await exec('git', [
-        'config', '--global', 'user.email', 'icemobile-ci@users.noreply.github.com'
+        'config', 'user.email', 'icemobile-ci@users.noreply.github.com'
     ]);
 
     await exec('git', [
-        'config', '--global', 'user.name', 'IceMobile CI'
+        'config', 'user.name', 'IceMobile CI'
     ]);
 
     await exec('git', [
@@ -91,7 +91,7 @@ async function tagRelease(releaseVersion, commitHash) {
     ]);
 
     await exec('git', [
-        'push', '-f', '--tags'
+        'push', '-f', '--tags',
     ], {
         env: {
             HUSKY: '0'
