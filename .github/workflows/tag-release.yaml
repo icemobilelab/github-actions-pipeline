@@ -1,9 +1,12 @@
+name: Tag v1 release
+run-name: Tag v1 release
 on:
   push:
     branches:
       - main
 jobs:
   tag:
+    name: Tag v1 release
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -13,3 +16,4 @@ jobs:
         run: |
           git tag -f v1
           git push --no-verify -f origin :refs/tags/v1
+          git push origin refs/tags/v1:refs/tags/v1
