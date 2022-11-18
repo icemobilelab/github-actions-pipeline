@@ -87,7 +87,7 @@ async function tagRelease(releaseVersion, commitHash) {
         'tag',
         '-a',
         releaseVersion, commitHash,
-        '-m' `versioning ${releaseVersion}`
+        '-m', `versioning ${releaseVersion}`
     ]);
 
     await exec('git', [
