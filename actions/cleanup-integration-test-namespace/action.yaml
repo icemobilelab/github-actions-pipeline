@@ -13,7 +13,7 @@ runs:
       if: ${{ !inputs.namespace }}
       id: testing-ns
       uses: icemobilelab/github-actions-pipeline/actions/get-testing-namespace@v1
-    - name: Create NS
+    - name: Delete namespace
       shell: bash
       run: |
         _ns="${{ inputs.namespace || steps.testing-ns.outputs.testing-namespace }}"

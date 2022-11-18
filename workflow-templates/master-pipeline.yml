@@ -107,7 +107,7 @@ jobs:
       - name: Deploy project
         uses: icemobilelab/github-actions-pipeline/actions/deploy-project@v1
         with:
-          namespace: ${{ inputs.deployment-namespace || "loyalty-tst" }}
+          namespace: ${{ inputs.deployment-namespace || 'loyalty-tst' }}
           ansible-vault-password-file: ${{ steps.ansible-vault.outputs.ansible-vault-password-file }}
   cleanup:
     if: ${{ always() }}
