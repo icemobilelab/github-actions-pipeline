@@ -6,6 +6,8 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
       - name: Tag commit
         shell: bash
         run: |
