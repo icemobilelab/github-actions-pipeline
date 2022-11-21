@@ -14,6 +14,8 @@
 !/actions/**/*.yml
 !/workflow-templates/**/*.yaml
 !/workflow-templates/**/*.yml
+!/cluster-configs/**/*.yaml
+!/cluster-configs/**/*.yml
 
 # 3scale config
 .3scalerc

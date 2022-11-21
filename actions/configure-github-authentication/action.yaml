@@ -12,3 +12,4 @@ runs:
       run: |
         git config --global --add url."https://${{ inputs.github-pat }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
         git config --global --add url."https://${{ inputs.github-pat }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com:"
+        git config --global --add url."https://${{ inputs.github-pat }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
