@@ -5,49 +5,5 @@ inputs:
     description: The namespace to where the project is deployed
     required: true
 runs:
-  using: composite
-  steps:
-    - name: Run Integration tests
-      shell: bash
-      run: |
-        # env
-        # npm run integration-test
-
-        _projectName="$(echo -n "$GITHUB_REPOSITORY" | awk -F/ '{ print $2 }')"
-        _ns="${{ inputs.namespace }}"
-        _oc="oc --namespace ${_ns}"
-        _branch="${GITHUB_REF_NAME:-${GITHUB_REF/refs\/heads\//}}"
-        _jobName="integration-tests-${_projectName}"
-
-        _serviceTag="${_branch//\//_}"
-        _serviceTag="${_serviceTag// /_}"
-        _serviceTag="${_serviceTag//./_}"
-
-        $_oc process --local \
-          -f "${GITHUB_ACTION_PATH}/templates/integration-test-job.yaml" \
-          -p TESTING_NAMESPACE="${_ns}" \
-          -p PROJECT_NAME="${_projectName}" \
-          -p SERVICE_TAG="${_serviceTag}" \
-          | $_oc apply -f -
-
-        echo ::notice ::Waiting for integration test job to start...
-        until [ "$($_oc get jobs "$_jobName" -o jsonpath='{.status.active}' 2>/dev/null)" = "1" ]; do
-          sleep 1
-        done
-
-        until $_oc logs -f job/$_jobName 2>/dev/null; do
-          sleep 2;
-          if [ "$($_oc get jobs "$_jobName" -o jsonpath='{.status.active}' 2>/dev/null)" != "1" ]; then
-            break;
-          fi
-        done
-
-        echo ::notice ::Waiting for integration test job to finish...
-        while [ "$($_oc get jobs "$_jobName" -o jsonpath='{.status.active}' 2>/dev/null)" = "1" ]; do
-          sleep 1
-        done
-
-        if [ "$($_oc get jobs "$_jobName" -o jsonpath='{.status.succeeded}' 2>/dev/null)" != "1" ]; then
-          echo ::error ::Integration tests failed
-          exit 1;
-        fi
+  using: node16
+  main: dist/index.mjs

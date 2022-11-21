@@ -34,17 +34,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-        with:
-          persist-credentials: false
       - name: Install and configure oc
         uses: icemobilelab/github-actions-pipeline/actions/install-and-configure-oc@v1
         with:
           openshift-server-api-url: ${{ secrets.ARO_TST_API_URL }}
           openshift-auth-token: ${{ secrets.ARO_TST_AUTH_TOKEN }}
-      - name: Reconfigure Git authentication
-        uses: icemobilelab/github-actions-pipeline/actions/configure-github-authentication@v1
-        with:
-          github-pat: ${{ secrets.IM_CI_GITHUB_TOKEN }}
       - name: Build Image
         uses: icemobilelab/github-actions-pipeline/actions/build-image@v1
   integration-tests:

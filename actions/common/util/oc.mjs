@@ -234,6 +234,17 @@ async function addRoleToGroup(role, group, additionalArgs = []) {
     return _exec('oc', args);
 }
 
+/**
+ *
+ * @param {string} cmd
+ * @param {string[]} args
+ * @param {import('@actions/exec').ExecOptions} execOptions
+ * @returns {Promise<import('@actions/exec').ExecOutput>}
+ */
+async function command(cmd, args, execOptions = { silent: true }) {
+    return _exec(cmd, args, execOptions);
+}
+
 export {
     login,
     tagImage,
@@ -248,4 +259,5 @@ export {
     deleteResource as del,
     newProject,
     addRoleToGroup,
+    command,
 };

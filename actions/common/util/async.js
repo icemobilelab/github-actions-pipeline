@@ -33,6 +33,11 @@ async function awaitWithTimeout(promise, timeoutMs) {
     return result;
 }
 
+async function sleep(durationMs) {
+    await setTimeout(durationMs);
+}
+
 export {
     awaitWithTimeout,
+    sleep,
 };

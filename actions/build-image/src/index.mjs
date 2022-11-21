@@ -1,4 +1,3 @@
-import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import * as core from '@actions/core';
 import { getExecOutput, exec } from '@actions/exec';
@@ -104,7 +103,7 @@ async function run() {
     const branchName = process.env.GITHUB_REF_NAME || process.env.GITHUB_REF.slice('refs/heads/'.length);
     const commitHash = getShortCommitHash();
     const pkg = JSON.parse(
-        await readFile(path.join(process.cwd(), 'package.json'))
+        await readFile('package.json')
     );
     const projectVersion = pkg.version.trim();
 
