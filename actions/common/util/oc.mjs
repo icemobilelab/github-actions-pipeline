@@ -242,7 +242,7 @@ async function addRoleToGroup(role, group, additionalArgs = []) {
  * @returns {Promise<import('@actions/exec').ExecOutput>}
  */
 async function command(cmd, args, execOptions = { silent: true }) {
-    return _exec(cmd, args, execOptions);
+    return _exec('oc', [cmd, ...args], execOptions);
 }
 
 export {
