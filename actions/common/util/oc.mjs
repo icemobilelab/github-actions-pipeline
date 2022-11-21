@@ -1,30 +1,5 @@
 import core from '@actions/core';
-import { getExecOutput } from '@actions/exec';
-
-/**
- * @type {import('@actions/exec').ExecOptions}
- */
-const FORCED_OPTIONS = {
-    ignoreReturnCode: true,
-};
-
-/**
- * @type {import('@actions/exec').getExecOutput}
- */
-async function _exec(command, args, options) {
-    const _opts = Object.assign({}, options, FORCED_OPTIONS);
-    const execOutput = await getExecOutput(command, args, _opts);
-
-    if (execOutput.exitCode === 0) {
-        return execOutput;
-    }
-
-    return Object.assign(
-        new Error(`Command '${command}' exited with code ${execOutput.exitCode}`),
-        execOutput
-    );
-};
-
+import { exec } from './exec.mjs';
 
 /**
  * @param {string} server The OpenShift server API URL
@@ -32,7 +7,7 @@ async function _exec(command, args, options) {
  * @returns {Promise.<import('@actions/exec').ExecOutput>}
  */
 async function login(server, token) {
-    return _exec('oc', [
+    return exec('oc', [
         'login',
         '--server', server,
         '--token', token,
@@ -55,7 +30,7 @@ async function tagImage(image, tags, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    return _exec('oc', args);
+    return exec('oc', args);
 }
 
 async function startBuild(buildName, followLogs = true, additionalArgs = []) {
@@ -72,7 +47,7 @@ async function startBuild(buildName, followLogs = true, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    return _exec('oc', args);
+    return exec('oc', args);
 }
 
 async function process(templatePath, parameters = {}, additionalArgs = []) {
@@ -91,7 +66,7 @@ async function process(templatePath, parameters = {}, additionalArgs = []) {
 
     core.debug(`oc ${args.join(' ')}`);
 
-    const { stdout: resourceDefinition } = await _exec('oc', args, {
+    const { stdout: resourceDefinition } = await exec('oc', args, {
         silent: true,
     });
 
@@ -109,7 +84,7 @@ async function applyFromResourceDefinitionString(resourceDefinition, additionalA
 
     args.push('-f', '-');
 
-    return _exec('oc', args, {
+    return exec('oc', args, {
         input: Buffer.from(resourceDefinition),
     });
 }
@@ -126,7 +101,7 @@ async function waitForRollout(deploymentConfig, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    return _exec('oc', args);
+    return exec('oc', args);
 }
 
 async function pauseRollouts(deploymentConfig, additionalArgs = []) {
@@ -140,7 +115,21 @@ async function pauseRollouts(deploymentConfig, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    return _exec('oc', args);
+    return exec('oc', args);
+}
+
+async function resumeRollouts(deploymentConfig, additionalArgs = []) {
+    const args = [
+        'rollout',
+        'resume',
+        `dc/${deploymentConfig}`,
+    ];
+
+    if (Array.isArray(additionalArgs) && additionalArgs.length > 0) {
+        args.push(...additionalArgs);
+    }
+
+    return exec('oc', args);
 }
 
 /**
@@ -163,14 +152,14 @@ async function get(resourceType, resourceName, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    const { stdout } = await _exec('oc', args, {
+    const { stdout } = await exec('oc', args, {
         silent: true
     });
 
     return stdout.trim().split('\n');
 }
 
-async function logs(resource, follow = false, additionalArgs = []) {
+async function logs(resource, follow = false, print = false, additionalArgs = []) {
     const args = [
         'logs',
         resource
@@ -184,8 +173,8 @@ async function logs(resource, follow = false, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    const { stdout } = await _exec('oc', args, {
-        silent: true
+    const { stdout } = await exec('oc', args, {
+        silent: !print
     });
 
     return stdout;
@@ -202,7 +191,7 @@ async function deleteResource(resourceType, resourceName, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    return _exec('oc', args);
+    return exec('oc', args);
 }
 
 async function newProject(projectName, additionalArgs = []) {
@@ -215,7 +204,7 @@ async function newProject(projectName, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    return _exec('oc', args);
+    return exec('oc', args);
 }
 
 async function addRoleToGroup(role, group, additionalArgs = []) {
@@ -231,7 +220,7 @@ async function addRoleToGroup(role, group, additionalArgs = []) {
         args.push(...additionalArgs);
     }
 
-    return _exec('oc', args);
+    return exec('oc', args);
 }
 
 /**
@@ -242,7 +231,7 @@ async function addRoleToGroup(role, group, additionalArgs = []) {
  * @returns {Promise<import('@actions/exec').ExecOutput>}
  */
 async function command(cmd, args, execOptions = { silent: true }) {
-    return _exec('oc', [cmd, ...args], execOptions);
+    return exec('oc', [cmd, ...args], execOptions);
 }
 
 export {
@@ -252,6 +241,7 @@ export {
     process,
     applyFromResourceDefinitionString,
     pauseRollouts,
+    resumeRollouts,
     waitForRollout,
     get,
     logs,

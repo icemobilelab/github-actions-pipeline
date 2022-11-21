@@ -7,6 +7,7 @@ const DEPLOYMENT_PROJECT_NAME = 'loyalty-tst';
 const WORKSPACE_DIRECTORY = dirname(process.env.GITHUB_WORKSPACE);
 const OPENSHIFT_TEMPLATES_PATH = 'openshift/templates';
 const TEMPLATE_PARAMETERS_DIRECTORY_NAME = 'parameters';
+const SSL_CERT_FILE = '/etc/ssl/certs/ca-certificates.crt';
 
 export {
     BUILD_TEMPLATE_PATH,
@@ -16,4 +17,5 @@ export {
     WORKSPACE_DIRECTORY,
     OPENSHIFT_TEMPLATES_PATH,
     TEMPLATE_PARAMETERS_DIRECTORY_NAME,
+    SSL_CERT_FILE,
 };

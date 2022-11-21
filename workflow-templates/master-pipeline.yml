@@ -12,6 +12,7 @@ on:
         type: string
         description: The namespace to which to deploy the project
         required: true
+        # Change 'loyalty-tst' to the namespace where your project needs to be deployed
         default: loyalty-tst
 jobs:
   unit-test:
@@ -82,6 +83,13 @@ jobs:
         uses: icemobilelab/github-actions-pipeline/actions/run-integration-tests@v1
         with:
           namespace: ${{ steps.create-ns.outputs.testing-namespace }}
+      - name: Archive integration test logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-tests-logs
+          path: |
+            integration-tests-logs.txt
   deploy-project:
     name: Deploy to TST
     runs-on: ubuntu-latest
@@ -98,11 +106,26 @@ jobs:
         with:
           openshift-server-api-url: ${{ secrets.ARO_TST_API_URL }}
           openshift-auth-token: ${{ secrets.ARO_TST_AUTH_TOKEN }}
+      - name: Install and configure Ansible Vault
+        id: ansible-vault
+        uses: icemobilelab/github-actions-pipeline/actions/configure-ansible-vault@v1
+        with:
+          ansible-vault-key: ${{ secrets.ANSIBLE_VAULT_KEY }}
       - name: Deploy project
         uses: icemobilelab/github-actions-pipeline/actions/deploy-project@v1
         with:
+          # Change 'loyalty-tst' to the namespace where your project needs to be deployed
           namespace: ${{ inputs.deployment-namespace || 'loyalty-tst' }}
           ansible-vault-password-file: ${{ steps.ansible-vault.outputs.ansible-vault-password-file }}
+      - name: Deploy to 3scale
+        uses: icemobilelab/github-actions-pipeline/actions/deploy-to-3scale@v1
+        # The following are the default values for the 3scale action. Uncomment and change if needed
+        # with:
+          # swagger-directory: docs/swagger
+          # internal-spec-file: <your-repo-name>.yml
+          # public-spec-file: public.yml
+          # cluster: TST
+
   cleanup:
     if: ${{ always() }}
     name: Log collection and cleanup

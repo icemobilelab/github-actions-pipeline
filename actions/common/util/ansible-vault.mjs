@@ -1,4 +1,4 @@
-import { exec } from '@actions/exec';
+import { exec } from '../../common/util/exec.mjs';
 
 async function decryptAnsibleVault(vaultPasswordFile, vaultFilePath) {
     await exec('ansible-vault', [
