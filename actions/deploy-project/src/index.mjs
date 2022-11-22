@@ -68,7 +68,15 @@ async function run() {
 
     if (inMainBranch) {
         await core.group(`Resuming rollouts of dc/${projectName}`,
-            () => oc.resumeRollouts(projectName, ocDeploymentArgs));
+            async () => {
+                try {
+                    oc.resumeRollouts(projectName, ocDeploymentArgs);
+                } catch (e) {
+                    core.warning('Failed to resume rollouts. Perhaps they\'re not paused?');
+                    core.warning(`Command output: ${e.stderr}`);
+                }
+            }
+        );
     }
 
     await core.group(`Wait for ${projectName} to be ready`,
