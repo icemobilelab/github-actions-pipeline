@@ -15,14 +15,16 @@ const ocArgs = [
 
 // eslint-disable-next-line no-unused-vars
 async function getGitTag() {
-    const gitTagOutput = await exec('git', [
-        'describe', '--exact-match', '--tags'
-    ], {
-        ignoreReturnCode: true,
-        silent: true
-    });
-
-    return gitTagOutput.exitCode === 0 ? gitTagOutput.stdout : 'latest';
+    try {
+        const { stdout: tag } = await exec('git', [
+            'describe', '--exact-match', '--tags'
+        ], {
+            silent: true
+        });
+        return tag.trim();
+    } catch {
+        return 'latest';
+    }
 }
 
 async function buildImage(projectName, branchName, commitHash, serviceTag) {
@@ -76,11 +78,11 @@ async function tagRelease(releaseVersion, commitHash) {
         'config', 'user.name', 'IceMobile CI'
     ]);
 
-    await exec('git', [
-        'tag', '-d', releaseVersion
-    ], {
-        ignoreReturnCode: true
-    });
+    try {
+        await exec('git', [
+            'tag', '-d', releaseVersion
+        ]);
+    } catch {};
 
     await exec('git', [
         'tag',
