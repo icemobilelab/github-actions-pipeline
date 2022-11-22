@@ -86,7 +86,7 @@ async function run() {
                         if (upstreamDependencies.length) {
                             core.debug(`${dependencyName} has deps: \n\t${upstreamDependencies.join('\n\t')}`);
                             dependencyStack.push(
-                                `${dependency}${dependencyRef ? `:${dependencyRef}` : ''}`,
+                                `${dependencyName}${dependencyRef ? `:${dependencyRef}` : ''}`,
                                 ...upstreamDependencies
                             );
                             continue;

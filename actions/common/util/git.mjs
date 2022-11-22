@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { exec, getExecOutput } from '@actions/exec';
+import { exec } from '../../common/util/exec.mjs';
 
 /**
  * Configures git globally for proper GitHub authentication
@@ -37,7 +37,7 @@ async function cloneGithubDependency(dependencyName, branch, baseDirectory) {
 
 const DEFAULT_BRANCH_REGEXP = /(main|master|develop)/;
 async function getDefaultGitBranch(projectName) {
-    const { stdout } = await getExecOutput('git', [
+    const { stdout } = await exec('git', [
         'ls-remote',
         '--symref',
         `git@github.com:icemobilelab/${projectName}.git`,

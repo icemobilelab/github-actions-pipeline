@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import * as core from '@actions/core';
-import { getExecOutput, exec } from '@actions/exec';
+import { exec } from '../../common/util/exec.mjs';
 import { getServiceTag, getShortCommitHash, isMainBranch } from '../../common/util/project-info.mjs';
 import * as oc from '../../common/util/oc.mjs';
 import {
@@ -15,7 +15,7 @@ const ocArgs = [
 
 // eslint-disable-next-line no-unused-vars
 async function getGitTag() {
-    const gitTagOutput = await getExecOutput('git', [
+    const gitTagOutput = await exec('git', [
         'describe', '--exact-match', '--tags'
     ], {
         ignoreReturnCode: true,

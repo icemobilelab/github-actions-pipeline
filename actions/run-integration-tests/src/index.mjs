@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import * as core from '@actions/core';
 import {
     getCurrentBranchName,
@@ -14,11 +14,13 @@ import { sleep } from '../../common/util/async.js';
 const ACTION_TEMPLATES_PATH = fileURLToPath(new URL('../templates', import.meta.url));
 
 async function _getJobPodCount(jobName, status, ocArgs) {
-    const { stdout } = await oc.command('get', [
+    const args = [
         'jobs', jobName,
         ...ocArgs,
-        '-o', `jonspath={.status.${status}}`
-    ]);
+        '-o', `jsonpath={.status.${status}}`
+    ];
+    const { stdout } = await oc.command('get', args);
+
     const podCount = parseInt(stdout.trim(), 10);
     return Number.isNaN(podCount) ? 0 : podCount;
 }
@@ -55,14 +57,15 @@ async function run() {
 
     for (; ;) {
         try {
-            await oc.logs(`job/${jobName}`, true, ocArgs);
+            const logs = await oc.logs(`job/${jobName}`, true, true, ocArgs);
+            await writeFile('integration-tests-logs.txt', logs);
             break;
         } catch (e) {
             await sleep(1000);
-            // const activePods = await _getJobPodCount(jobName, 'active', ocArgs);
-            // if (activePods !== 1) {
-            //     break;
-            // }
+            const activePods = await _getJobPodCount(jobName, 'active', ocArgs);
+            if (activePods !== 1) {
+                break;
+            }
         }
 
     }

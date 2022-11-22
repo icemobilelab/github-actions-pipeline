@@ -22,7 +22,7 @@ async function run() {
 
     await Promise.all(
         pods.map(async pod => {
-            const logs = await oc.logs(pod, false, ocArgs);
+            const logs = await oc.logs(pod, false, false, ocArgs);
             const fileName = `${pod.replace('pod/', '')}.txt`;
             const fullFilePath = path.join(LOGS_OUTPUT_DIR, fileName);
             await writeFile(fullFilePath, logs);

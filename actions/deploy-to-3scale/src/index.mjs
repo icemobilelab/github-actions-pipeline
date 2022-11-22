@@ -1,14 +1,14 @@
 import process from 'node:process';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
-import { exec } from '@actions/exec';
+import { exec } from '../../common/util/exec.mjs';
 
 import { extract3scaleConfig } from './extract-3scale-config.mjs';
 import { deployTo3scale } from './deploy-to-3scale.mjs';
 
-const CACHE_KEY = '3scale';
-const CACHE_FILENAME = '3scale.deb';
 const VERSION = '0.20.0';
+const CACHE_FILENAME = '3scale.deb';
+const CACHE_KEY = `3scale-${VERSION}`;
 // eslint-disable-next-line max-len
 const THREESCALE_TOOLBOX_URL = `https://github.com/3scale-labs/3scale_toolbox_packaging/releases/download/v${VERSION}/3scale-toolbox_${VERSION}-1_amd64.deb`;
 
@@ -24,9 +24,9 @@ async function run() {
 
         await install3scaleToolbox();
         await deployTo3scale({
-            swaggerDirectory: core.getInput('swaggerDirectory', { required: true }),
-            internalSpecFile: core.getInput('internalSpecFile') || `${projectName}.yml`,
-            publicSpecFile: core.getInput('publicSpecFile', { required: true }),
+            swaggerDirectory: core.getInput('swagger-directory', { required: true }),
+            internalSpecFile: core.getInput('internal-spec-file') || `${projectName}.yml`,
+            publicSpecFile: core.getInput('public-spec-file', { required: true }),
             publicAPIBasePath: threescaleConfig.publicBasePath,
             systemName: threescaleConfig.systemName,
             destinationCluster: threescaleConfig.threescaleDestinationCluster,
@@ -49,7 +49,7 @@ async function install3scaleToolbox() {
 
         await exec('bash', [
             '-c',
-            `sudo dpkg -i "${cached}"`
+            `sudo dpkg -i "${cached}/${CACHE_FILENAME}"`
         ], {
             silent: true
         });

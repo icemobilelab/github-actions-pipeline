@@ -1,10 +1,10 @@
 import path from 'node:path';
 import * as core from '@actions/core';
-import { exec } from '@actions/exec';
+import { exec } from '../../common/util/exec.mjs';
 import { writeFile } from 'fs/promises';
 import { mergeSwagger } from './merge-swagger.mjs';
 import * as oc from '../../common/util/oc.mjs';
-import { CICD_PROJECT_NAME } from '../../common/constants.mjs';
+import { CICD_PROJECT_NAME, SSL_CERT_FILE } from '../../common/constants.mjs';
 
 const THREESCALE_RC_PATH = '.3scalerc';
 const TOOLBOX_SECRET_NAME = '3scale-toolbox';
@@ -13,9 +13,10 @@ const TOOLBOX_SECRET_KEY = '.3scalerc.yaml';
 
 async function downloadAndDecode3scaleToolboxConfig() {
     await core.group('Download 3scale-toolbox config', async () => {
-        const secret = await oc.get('secrets', TOOLBOX_SECRET_NAME, [
+        const { stdout: secret } = await oc.command('get', [
             '--namespace',
             TOOLBOX_SECRET_NAMESPACE,
+            'secrets', TOOLBOX_SECRET_NAME,
             '-o', 'json'
         ]);
 
@@ -41,7 +42,12 @@ async function importOpenAPISpec(configPath, openApiSpec, projectName, destinati
             '-d', destinationCluster,
             '-t', systemName,
             openApiSpec
-        ]));
+        ], {
+            env: {
+                SSL_CERT_FILE,
+            }
+        })
+    );
 }
 
 async function promoteProxyConfig(configPath, destinationCluster, systemName) {
@@ -52,7 +58,11 @@ async function promoteProxyConfig(configPath, destinationCluster, systemName) {
             'deploy',
             destinationCluster,
             systemName
-        ]);
+        ], {
+            env: {
+                SSL_CERT_FILE,
+            }
+        });
 
         await exec('3scale', [
             '-c', THREESCALE_RC_PATH,
@@ -60,7 +70,11 @@ async function promoteProxyConfig(configPath, destinationCluster, systemName) {
             'promote',
             destinationCluster,
             systemName
-        ]);
+        ], {
+            env: {
+                SSL_CERT_FILE,
+            }
+        });
     });
 }
 

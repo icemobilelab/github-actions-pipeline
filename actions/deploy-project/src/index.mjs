@@ -25,16 +25,33 @@ async function run() {
     const namespace = core.getInput('namespace');
     const ansibleVaultPasswordFile = core.getInput('ansible-vault-password-file');
 
-    const ocDeploymentArgs = [
-        '--namespace', namespace,
-    ];
+    const ocDeploymentArgs = ['--namespace', namespace];
+    const ocBuildArgs = ['--namespace', BUILD_PROJECT_NAME];
 
     const pkg = await readFile('package.json');
     const { version } = JSON.parse(pkg);
     const serviceTag = getServiceTag(branchName, version, commitHash);
 
     if (inMainBranch) {
-        await core.group(`Pausing rollouts of dc/${projectName}`, () => oc.pauseRollouts(projectName));
+        await core.group(`Pausing rollouts of dc/${projectName}`,
+            async () => {
+                try {
+                    await oc.pauseRollouts(projectName, ocDeploymentArgs);
+                } catch (e) {
+                    core.warning('Failed to pause rollouts. Perhaps they\'re already paused?');
+                    core.warning(`Command output: ${e.stderr}`);
+                }
+            });
+        await core.group('Tag image as stable', async () => {
+            const imageName = `${BUILD_PROJECT_NAME}/${projectName}`;
+            await oc.tagImage(`${imageName}:${serviceTag}`, [
+                `${imageName}:${branchName}`,
+                `${imageName}:${serviceTag}-stable`,
+            ], ocBuildArgs);
+            await oc.tagImage(`${imageName}:${serviceTag}`, [
+                `${namespace}/${projectName}:${serviceTag}`,
+            ], ocDeploymentArgs);
+        });
     }
 
     await core.group(`Deploy ${projectName}`,
@@ -49,18 +66,18 @@ async function run() {
         ), TIMEOUT)
     );
 
+    if (inMainBranch) {
+        await core.group(`Resuming rollouts of dc/${projectName}`,
+            () => oc.resumeRollouts(projectName, ocDeploymentArgs));
+    }
+
     await core.group(`Wait for ${projectName} to be ready`,
         () => waitForDeployment(projectName, ocDeploymentArgs)
     );
 
-    if (inMainBranch) {
-        await core.group('Tag image as stable', async () => {
-            const imageName = `${BUILD_PROJECT_NAME}/${projectName}`;
-            await oc.tagImage(`${imageName}:${serviceTag}`, [
-                `${imageName}:${branchName}`,
-                `${imageName}:${serviceTag}-stable`
-            ], ['--namespace', BUILD_PROJECT_NAME]);
-        });
+    if (!inMainBranch) {
+        await core.group('Cleaning up temporary docker image tags',
+            () => oc.del('istag', `${projectName}:${serviceTag}`, ocBuildArgs));
     }
 }
 

@@ -2,7 +2,7 @@ import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import * as core from '@actions/core';
-import { getExecOutput } from '@actions/exec';
+import { exec } from '../../common/util/exec.mjs';
 import * as oc from './oc.mjs';
 import { decryptAnsibleVault } from './ansible-vault.mjs';
 import { getServiceTag, getShortCommitHash } from './project-info.mjs';
@@ -46,7 +46,7 @@ async function deployGitHubProject(
         }
 
         if (!branch) {
-            const { stdout } = await getExecOutput('git', [
+            const { stdout } = await exec('git', [
                 'branch', '--show-current'
             ], {
                 cwd: dependencyDirectory,

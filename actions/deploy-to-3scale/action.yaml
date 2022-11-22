@@ -15,16 +15,16 @@ description: |
         ]
     }
 inputs:
-  swaggerDirectory:
+  swagger-directory:
     description: >
       The path to the directory within the calling repository that contains the OpenAPI files.
       Defaults to `docs/swagger`
     default: docs/swagger
     required: false
-  internalSpecFile:
+  internal-spec-file:
     description: Name of the OpenAPI internal spec file. Defaults to `<repo-name>.yml`
     required: false
-  publicSpecFile:
+  public-spec-file:
     description: Name of the OpenAPI public spec file. Defaults to `public.yml`
     default: public.yml
     required: false
@@ -41,4 +41,4 @@ inputs:
     default: TST
 runs:
   using: node16
-  main: dist/index.js
+  main: dist/index.mjs
