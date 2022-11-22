@@ -70,7 +70,7 @@ async function run() {
         await core.group(`Resuming rollouts of dc/${projectName}`,
             async () => {
                 try {
-                    oc.resumeRollouts(projectName, ocDeploymentArgs);
+                    await oc.resumeRollouts(projectName, ocDeploymentArgs);
                 } catch (e) {
                     core.warning('Failed to resume rollouts. Perhaps they\'re not paused?');
                     core.warning(`Command output: ${e.stderr}`);
