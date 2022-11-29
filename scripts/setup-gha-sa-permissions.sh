@@ -3,26 +3,37 @@
 set -e;
 
 declare force=0
-declare -r base_rb_name='github-actions-edit'
+declare delete=0
+declare -r base_rb_name='github-actions'
 declare -r tst_url='https://api.r3vzjvjk.westeurope.aroapp.io:6443'
-declare -r -a namespaces=(
+declare -r -a admin_namespaces=(
+    cicd
+    build
+)
+declare -r -a edit_namespaces=(
     # Add new namespaces here
-    safeway-ca-tst
-    oxxo-mx-tst
+    club-leaf
     coop-vn-tst
     iga-ca-tst
     loyalty-tst
-    club-leaf
+    oxxo-mx-tst
+    safeway-ca-tst
+)
+declare -r -a cluster_roles=(
+    namespace-editor
+    self-provisioner
+    # registry-editor
 )
 
 usage() {
     cat <<EOUSAGE
 Creates missing RoleBindings necessary for proper GitHub Actions operations.
 
-Usage: "$0" [-f] [-h]
+Usage: "$0" [-f | -D] [-h]
 
 Options:
-    -f      Forces recreating RoleBindings even if they already exists
+    -f      Forces recreating role bindings even if they already exists
+    -D      Deletes all role existing bindings (conflicts with -f)
     -h      Show this message
 EOUSAGE
 }
@@ -43,59 +54,125 @@ _check_login_status() {
     fi
 }
 
-_check_rolebinding() {
-    kubectl --namespace "$1" get rolebinding \
-        "${base_rb_name}-${1}" \
+_get_ns_arg() {
+    if [ -z "$ns" ]; then
+        echo -n
+    else
+        echo -n "--namespace $ns"
+    fi
+}
+
+_check() {
+    local type="$1"
+    local name="$2"
+    local ns="$3"
+    # shellcheck disable=SC2046
+    kubectl $(_get_ns_arg "$ns") get "$type" \
+        "$name" \
         -o name &>/dev/null
 
     return $?;
 }
 
-_create_rolebinding() {
-    kubectl --namespace "$1" create rolebinding \
-        "${base_rb_name}-${1}" \
-        --clusterrole=edit \
+_create() {
+    local type="$1"
+    local name="$2"
+    local role="$3"
+    local ns="$4"
+    # shellcheck disable=SC2046
+    kubectl $(_get_ns_arg "$ns") create "$type" \
+        "$name" \
+        --clusterrole="$role" \
         --serviceaccount=cicd:github-actions-sa
 }
 
-_delete_rolebinding() {
-    kubectl --namespace "$1" delete rolebinding \
-        "${base_rb_name}-${1}"
+_delete() {
+    local type="$1"
+    local name="$2"
+    local ns="$3"
+    # shellcheck disable=SC2046
+    kubectl $(_get_ns_arg "$ns") delete "$type" \
+        "$name"
 }
 
-_ignore_rolebinding() {
-    echo "RoleBinding ${base_rb_name}-${1} already exists"
+_ignore() {
+    local type="$1"
+    local name="$2"
+    if [ "$delete" -eq 1 ]; then
+        echo "$1 ${name} doesn't exist"
+    else
+        echo "$1 ${name} already exists"
+    fi
 }
 
-_setup_rolebindings() {
-    for ns in "${namespaces[@]}"; do
-        if _check_rolebinding "$ns"; then
-            if [ "$force" -eq 1 ]; then
-                _delete_rolebinding "$ns"
-                _create_rolebinding "$ns"
-            else
-                _ignore_rolebinding "$ns"
-            fi
+
+
+_setup_binding() {
+    local type="$1"
+    local name="$2"
+    local role="$3"
+    local ns="$4"
+
+    if _check "$type" "$name" "$ns"; then
+        if [ "$delete" -eq 1 ]; then
+            _delete "$type" "$name" "$ns"
+        elif [ "$force" -eq 1 ]; then
+            _delete "$type" "$name" "$ns"
+            _create "$type" "$name" "$role" "$ns"
         else
-                _create_rolebinding "$ns"
+            _ignore "$type" "$name" "$ns"
         fi
+    elif [ "$delete" -eq 1 ]; then
+        _ignore "$type" "$name" "$ns"
+    else
+        _create "$type" "$name" "$role" "$ns"
+    fi
+}
+
+_setup_edit_rolebindings() {
+    for ns in "${edit_namespaces[@]}"; do
+        local rb="${base_rb_name}-edit-${ns}"
+        _setup_binding 'rolebinding' "$rb" 'edit' "$ns"
+    done
+}
+
+_setup_admin_rolebindings() {
+    for ns in "${admin_namespaces[@]}"; do
+        local rb="${base_rb_name}-admin-${ns}"
+        _setup_binding 'rolebinding' "$rb" 'admin' "$ns"
+    done
+}
+
+_setup_cluster_rolebindings() {
+    for cr in "${cluster_roles[@]}"; do
+        local crb="${base_rb_name}-${cr}"
+        _setup_binding 'clusterrolebinding' "$crb" "$cr"
     done
 }
 
 go() {
     _check_login_status
-    _setup_rolebindings
+    _setup_edit_rolebindings
+    _setup_admin_rolebindings
+    _setup_cluster_rolebindings
 
     echo
     echo OK!
 }
 
-while getopts 'fh' arg; do
+while getopts 'fhD' arg; do
 	case "${arg}" in
         f) force=1 ;;
+        D) delete=1 ;;
 		h) usage; exit 0 ;;
 		*) usage; exit 1 ;;
 	esac
 done
+
+if [ "$delete" -eq 1 ] && [ "$force" -eq 1 ]; then
+    usage
+    _error "Options '-f' and '-D' are mutually exclusive"
+fi
+
 
 go

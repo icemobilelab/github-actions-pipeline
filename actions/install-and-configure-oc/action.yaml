@@ -9,7 +9,10 @@ inputs:
 runs:
   using: composite
   steps:
+    # At the time of writing, oc is already installed in Ubuntu runners, per
+    # https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#cli-tools
     - name: Install oc
+      if: ${{ !!env.ACT }}
       uses: redhat-actions/openshift-tools-installer@v1
       with:
         oc: '4'

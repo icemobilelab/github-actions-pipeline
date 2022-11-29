@@ -11,7 +11,10 @@ outputs:
 runs:
   using: composite
   steps:
+    # At the time of writing, Ansible is already installed in Ubuntu runners, per
+    # https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#tools
     - uses: actions/cache@v3
+      if: ${{ !!env.ACT }}
       id: ansible-cache
       with:
         path: |
@@ -20,7 +23,7 @@ runs:
         key: ansible-vault
     - name: Install Ansible
       shell: bash
-      if: steps.ansible-cache.outputs.cache-hit != 'true'
+      if: ${{ !!env.ACT && steps.ansible-cache.outputs.cache-hit != 'true' }}
       run: |
         curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py
         python3 get-pip.py
