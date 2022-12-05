@@ -30,7 +30,7 @@ function getCurrentBranchName() {
 }
 
 async function _getHEADHash(short = false) {
-    const { stdout: sha } = exec('git',[
+    const { stdout: sha } = await exec('git',[
         'rev-parse',
         ...(short ? ['--short'] : []),
         'HEAD',
