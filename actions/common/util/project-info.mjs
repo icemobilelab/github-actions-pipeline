@@ -1,3 +1,5 @@
+import { exec } from './exec.mjs';
+
 function getServiceTag(branch, projectVersion, commitHash) {
     if (branch === 'develop' || branch === 'master' || branch === 'main') {
         return projectVersion;
@@ -27,8 +29,22 @@ function getCurrentBranchName() {
         process.env.GITHUB_REF.slice('refs/heads/'.length);
 }
 
-function getShortCommitHash() {
-    return process.env.GITHUB_SHA.slice(0, 10);
+async function _getHEADHash(short = false) {
+    const { stdout: sha } = exec('git',[
+        'rev-parse',
+        ...(short ? ['--short'] : []),
+        'HEAD',
+    ]);
+
+    return sha.trim();
+}
+
+async function getCurrentCommitShortHash() {
+    return _getHEADHash(true);
+}
+
+async function getCurrentCommitHash() {
+    return _getHEADHash(false);
 }
 
 /**
@@ -37,9 +53,9 @@ function getShortCommitHash() {
  * @param {string} [projectName] The name of the project. If null, calculated from environment
  * @returns {string} the testing namespace
  */
-function getTestingNamespace(projectName) {
+async function getTestingNamespace(projectName) {
     const _projectName = projectName || getCurrentProjectName();
-    const shortSha = getShortCommitHash();
+    const shortSha = await getCurrentCommitShortHash();
     return `test-${_projectName}-${shortSha}-p4vl0s7r1n9`;
 }
 
@@ -51,8 +67,8 @@ export {
     getServiceTag,
     getCurrentProjectName,
     getCurrentBranchName,
+    getCurrentCommitHash,
     getTestingNamespace,
-    getShortCommitHash,
+    getCurrentCommitShortHash,
     isMainBranch,
 };
-

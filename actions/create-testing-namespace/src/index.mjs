@@ -4,7 +4,7 @@ import { getTestingNamespace } from '../../common/util/project-info.mjs';
 import { CICD_PROJECT_NAME } from '../../common/constants.mjs';
 
 async function run() {
-    const testingNamespace = getTestingNamespace();
+    const testingNamespace = await getTestingNamespace();
 
     const ocArgs = ['--namespace', testingNamespace];
 

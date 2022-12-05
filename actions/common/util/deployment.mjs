@@ -5,7 +5,7 @@ import * as core from '@actions/core';
 import { exec } from '../../common/util/exec.mjs';
 import * as oc from './oc.mjs';
 import { decryptAnsibleVault } from './ansible-vault.mjs';
-import { getServiceTag, getShortCommitHash } from './project-info.mjs';
+import { getCurrentCommitShortHash, getServiceTag } from './project-info.mjs';
 import {
     BUILD_NAMESPACE,
     OPENSHIFT_TEMPLATES_PATH,
@@ -74,7 +74,7 @@ async function deployGitHubProject(
 
 async function deployService(namespace, projectName, branch, projectVersion, templatePath, ocArgs) {
     const imageName = `${BUILD_NAMESPACE}/${projectName}`;
-    const commitHash = getShortCommitHash();
+    const commitHash = await getCurrentCommitShortHash();
     const serviceTag = getServiceTag(branch, projectVersion, commitHash);
 
     await oc.tagImage(`${imageName}:${serviceTag}`, `${namespace}/${projectName}:${serviceTag}`, ocArgs);

@@ -1,7 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import * as core from '@actions/core';
 import { exec } from '../../common/util/exec.mjs';
-import { getServiceTag, getShortCommitHash, isMainBranch } from '../../common/util/project-info.mjs';
+import {
+    getCurrentBranchName,
+    getCurrentCommitShortHash,
+    getCurrentProjectName,
+    getServiceTag,
+    isMainBranch
+} from '../../common/util/project-info.mjs';
 import * as oc from '../../common/util/oc.mjs';
 import {
     BUILD_NAMESPACE,
@@ -82,7 +88,7 @@ async function tagRelease(releaseVersion, commitHash) {
         await exec('git', [
             'tag', '-d', releaseVersion
         ]);
-    } catch {};
+    } catch { };
 
     await exec('git', [
         'tag',
@@ -101,9 +107,9 @@ async function tagRelease(releaseVersion, commitHash) {
 }
 
 async function run() {
-    const projectName = process.env.GITHUB_REPOSITORY.split('/')[1];
-    const branchName = process.env.GITHUB_REF_NAME || process.env.GITHUB_REF.slice('refs/heads/'.length);
-    const commitHash = getShortCommitHash();
+    const projectName = getCurrentProjectName();
+    const branchName = getCurrentBranchName();
+    const commitHash = await getCurrentCommitShortHash();
     const pkg = JSON.parse(
         await readFile('package.json')
     );

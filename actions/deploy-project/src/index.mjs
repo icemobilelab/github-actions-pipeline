@@ -6,9 +6,9 @@ import {
 } from '../../common/constants.mjs';
 import {
     getCurrentBranchName,
+    getCurrentCommitShortHash,
     getCurrentProjectName,
     getServiceTag,
-    getShortCommitHash,
     isMainBranch,
 } from '../../common/util/project-info.mjs';
 import * as oc from '../../common/util/oc.mjs';
@@ -20,7 +20,7 @@ const TIMEOUT = 300_000;
 async function run() {
     const projectName = getCurrentProjectName();
     const branchName = getCurrentBranchName();
-    const commitHash = getShortCommitHash();
+    const commitHash = await getCurrentCommitShortHash();
     const inMainBranch = isMainBranch(branchName);
     const namespace = core.getInput('namespace');
     const ansibleVaultPasswordFile = core.getInput('ansible-vault-password-file');

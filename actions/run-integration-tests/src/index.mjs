@@ -4,9 +4,9 @@ import { readFile, writeFile } from 'node:fs/promises';
 import * as core from '@actions/core';
 import {
     getCurrentBranchName,
+    getCurrentCommitShortHash,
     getCurrentProjectName,
     getServiceTag,
-    getShortCommitHash
 } from '../../common/util/project-info.mjs';
 import * as oc from '../../common/util/oc.mjs';
 import { sleep } from '../../common/util/async.js';
@@ -35,7 +35,8 @@ async function run() {
         await readFile('package.json')
     );
     const projectVersion = pkg.version.trim();
-    const serviceTag = getServiceTag(branch, projectVersion, getShortCommitHash());
+    const shortCommitSha = await getCurrentCommitShortHash();
+    const serviceTag = getServiceTag(branch, projectVersion, shortCommitSha);
 
     const job = await oc.process(path.join(ACTION_TEMPLATES_PATH, 'integration-test-job.yaml'), {
         TESTING_NAMESPACE: namespace,
