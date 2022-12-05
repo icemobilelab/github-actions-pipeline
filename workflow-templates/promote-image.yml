@@ -17,7 +17,6 @@ on:
           which promote to all acc and all prd clusters, respectively
       user:
         type: string
-        default: ${{ github.actor }}
         required: true
         description: The user promoting the image
 jobs:

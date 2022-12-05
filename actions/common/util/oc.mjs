@@ -180,21 +180,17 @@ async function get(resourceType, resourceName, additionalArgs = []) {
 
     args.push('-o', 'json');
 
-    try {
-        const { stdout } = await exec('oc', args, {
-            silent: true
-        });
+    const { stdout } = await exec('oc', args, {
+        silent: true
+    });
 
-        const results = JSON.parse(stdout.trim());
+    const results = JSON.parse(stdout.trim());
 
-        if (results.kind === 'List') {
-            return results.items;
-        }
-
-        return [results];
-    } catch {
-        return [];
+    if (results.kind === 'List') {
+        return results.items;
     }
+
+    return [results];
 }
 
 async function logs(resource, follow = false, print = false, additionalArgs = []) {

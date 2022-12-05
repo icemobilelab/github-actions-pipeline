@@ -17,7 +17,6 @@ on:
           which promote to all acc and all prd clusters, respectively
       user:
         type: string
-        default: ${{ github.actor }}
         required: true
         description: The user promoting the image
 jobs:
@@ -32,9 +31,9 @@ jobs:
           cluster: ${{ inputs.cluster }}
           user: ${{ inputs.user }}
         env:
-          TST_AUTH_TOKEN: ${{ secrets.TST_AUTH_TOKEN }}
-          ACC_CANADACENTRAL_AUTH_TOKEN: ${{ secrets.ACC_CANADACENTRAL_AUTH_TOKEN }}
-          ACC_WESTEUROPE_AUTH_TOKEN: ${{ secrets.ACC_WESTEUROPE_AUTH_TOKEN }}
-          PRD_CANADACENTRAL_AUTH_TOKEN: ${{ secrets.PRD_CANADACENTRAL_AUTH_TOKEN }}
-          PRD_CANADACENTRAL2_AUTH_TOKEN: ${{ secrets.PRD_CANADACENTRAL2_AUTH_TOKEN }}
-          PRD_WESTEUROPE_AUTH_TOKEN: ${{ secrets.PRD_WESTEUROPE_AUTH_TOKEN }}
+          ARO_TST_AUTH_TOKEN: ${{ secrets.ARO_TST_AUTH_TOKEN }}
+          ARO_ACC_CANADACENTRAL_AUTH_TOKEN: ${{ secrets.ARO_ACC_CANADACENTRAL_AUTH_TOKEN }}
+          ARO_ACC_WESTEUROPE_AUTH_TOKEN: ${{ secrets.ARO_ACC_WESTEUROPE_AUTH_TOKEN }}
+          ARO_PRD_CANADACENTRAL_AUTH_TOKEN: ${{ secrets.ARO_PRD_CANADACENTRAL_AUTH_TOKEN }}
+          ARO_PRD_CANADACENTRAL2_AUTH_TOKEN: ${{ secrets.ARO_PRD_CANADACENTRAL2_AUTH_TOKEN }}
+          ARO_PRD_WESTEUROPE_AUTH_TOKEN: ${{ secrets.ARO_PRD_WESTEUROPE_AUTH_TOKEN }}
