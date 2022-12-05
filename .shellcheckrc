@@ -1,0 +1,8 @@
+enable=check-set-e-suppressed
+enable=quote-safe-variables
+enable=check-unassigned-uppercase
+enable=avoid-nullary-conditions
+enable=add-default-case
+
+external-sources=true
+check-sourced=true

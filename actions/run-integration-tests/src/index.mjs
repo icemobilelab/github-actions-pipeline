@@ -45,7 +45,7 @@ async function run() {
 
     await oc.applyFromResourceDefinitionString(job, ocArgs);
 
-    core.notice('Waiting for integration test job to start...');
+    core.info('Waiting for integration test job to start...');
     for (; ;) {
         const activePods = await _getJobPodCount(jobName, 'active', ocArgs);
         if (activePods === 1) {
@@ -70,7 +70,7 @@ async function run() {
 
     }
 
-    core.notice('Waiting for integration test job to finish...');
+    core.info('Waiting for integration test job to finish...');
     for (; ;) {
         const activePods = await _getJobPodCount(jobName, 'active', ocArgs);
         if (activePods !== 1) {

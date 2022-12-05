@@ -1,5 +1,5 @@
 name: PR Checks
-run-name: 'PR checks: ${{ github.ref_name }}'
+run-name: 'PR checks: ${{ github.head_ref }}'
 on:
   pull_request_target:
 jobs:

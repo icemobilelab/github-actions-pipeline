@@ -4,13 +4,13 @@ import { exec } from '../../common/util/exec.mjs';
 import { getServiceTag, getShortCommitHash, isMainBranch } from '../../common/util/project-info.mjs';
 import * as oc from '../../common/util/oc.mjs';
 import {
-    BUILD_PROJECT_NAME,
+    BUILD_NAMESPACE,
     BUILD_TEMPLATE_PATH,
     DEPLOYMENT_PROJECT_NAME
 } from '../../common/constants.mjs';
 
 const ocArgs = [
-    '--namespace', BUILD_PROJECT_NAME,
+    '--namespace', BUILD_NAMESPACE,
 ];
 
 // eslint-disable-next-line no-unused-vars
@@ -33,7 +33,7 @@ async function buildImage(projectName, branchName, commitHash, serviceTag) {
     await startBuild(projectName);
 
     if (isMainBranch(branchName)) {
-        const imageName = `${BUILD_PROJECT_NAME}/${projectName}`;
+        const imageName = `${BUILD_NAMESPACE}/${projectName}`;
         const releaseVersion = `v${serviceTag}`;
 
         const imageWithTag = `${imageName}:${serviceTag}`;

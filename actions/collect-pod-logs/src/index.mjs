@@ -12,7 +12,7 @@ async function run() {
     ];
 
     const [pods] = await Promise.all([
-        oc.get('pods', null, ocArgs),
+        oc.getNames('pods', ocArgs),
         mkdir(LOGS_OUTPUT_DIR, {
             recursive: true
         }),

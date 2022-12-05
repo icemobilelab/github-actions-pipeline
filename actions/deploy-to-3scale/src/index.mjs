@@ -19,7 +19,7 @@ async function run() {
 
     const threescaleConfig = await extract3scaleConfig(cluster);
 
-    if (threescaleConfig.deploy) {
+    if (threescaleConfig) {
         const projectName = process.env.GITHUB_REPOSITORY.split('/')[1];
 
         await install3scaleToolbox();
