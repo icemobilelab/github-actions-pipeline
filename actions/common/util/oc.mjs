@@ -136,15 +136,13 @@ async function resumeRollouts(deploymentConfig, additionalArgs = []) {
  * Fetches a list of resource names from the cluster
  *
  * @param {string} resourceType The resource type to fetch
- * @param {string} [resourceName] The resource name to fetch
  * @param {string[]} additionalArgs Additional arguments to the `oc get` command
  * @returns {Promise<string[]>} A list of the names of found resources
  */
-async function get(resourceType, resourceName, additionalArgs = []) {
+async function getNames(resourceType, additionalArgs = []) {
     const args = [
         'get',
         resourceType,
-        ...(resourceName ? [resourceName] : []),
         '-o', 'name'
     ];
 
@@ -157,6 +155,46 @@ async function get(resourceType, resourceName, additionalArgs = []) {
     });
 
     return stdout.trim().split('\n');
+}
+
+/**
+ * Fetches one or more resources from the cluster as JSON
+ *
+ * @param {string} resourceType The resource type to fetch
+ * @param {string} [resourceName] The resource name to fetch. If missing, will fetch
+ *  all resources of the specified type
+ * @param {string[]} additionalArgs Additional arguments to the `oc get` command, e.g.
+ *  labels by which to filter
+ * @returns {Promise<Object[]>} A list of the resources found
+ */
+async function get(resourceType, resourceName, additionalArgs = []) {
+    const args = [
+        'get',
+        resourceType,
+        ...(resourceName ? [resourceName] : []),
+    ];
+
+    if (Array.isArray(additionalArgs) && additionalArgs.length > 0) {
+        args.push(...additionalArgs);
+    }
+
+    args.push('-o', 'json');
+
+    try {
+        const { stdout } = await exec('oc', args, {
+            silent: true
+        });
+
+        const results = JSON.parse(stdout.trim());
+
+        if (results.kind === 'List') {
+            return results.items;
+        }
+
+        return [results];
+    } catch {
+        return [];
+    }
 }
 
 async function logs(resource, follow = false, print = false, additionalArgs = []) {
@@ -243,6 +281,7 @@ export {
     pauseRollouts,
     resumeRollouts,
     waitForRollout,
+    getNames,
     get,
     logs,
     deleteResource,

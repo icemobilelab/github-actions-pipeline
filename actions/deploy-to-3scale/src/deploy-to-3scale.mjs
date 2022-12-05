@@ -13,15 +13,12 @@ const TOOLBOX_SECRET_KEY = '.3scalerc.yaml';
 
 async function downloadAndDecode3scaleToolboxConfig() {
     await core.group('Download 3scale-toolbox config', async () => {
-        const { stdout: secret } = await oc.command('get', [
+        const [secret] = await oc.get('secret', TOOLBOX_SECRET_NAME, [
             '--namespace',
             TOOLBOX_SECRET_NAMESPACE,
-            'secrets', TOOLBOX_SECRET_NAME,
-            '-o', 'json'
         ]);
 
-        const secretJson = JSON.parse(secret);
-        const threescaleRc = secretJson.data[TOOLBOX_SECRET_KEY];
+        const threescaleRc = secret.data[TOOLBOX_SECRET_KEY];
         const decoded = Buffer.from(threescaleRc, 'base64');
 
         await writeFile(THREESCALE_RC_PATH, decoded);

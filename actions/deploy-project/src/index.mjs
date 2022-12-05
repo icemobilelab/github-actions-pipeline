@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import * as core from '@actions/core';
 import {
-    BUILD_PROJECT_NAME,
+    BUILD_NAMESPACE,
     WORKSPACE_DIRECTORY,
 } from '../../common/constants.mjs';
 import {
@@ -26,7 +26,7 @@ async function run() {
     const ansibleVaultPasswordFile = core.getInput('ansible-vault-password-file');
 
     const ocDeploymentArgs = ['--namespace', namespace];
-    const ocBuildArgs = ['--namespace', BUILD_PROJECT_NAME];
+    const ocBuildArgs = ['--namespace', BUILD_NAMESPACE];
 
     const pkg = await readFile('package.json');
     const { version } = JSON.parse(pkg);
@@ -43,7 +43,7 @@ async function run() {
                 }
             });
         await core.group('Tag image as stable', async () => {
-            const imageName = `${BUILD_PROJECT_NAME}/${projectName}`;
+            const imageName = `${BUILD_NAMESPACE}/${projectName}`;
             await oc.tagImage(`${imageName}:${serviceTag}`, [
                 `${imageName}:${branchName}`,
                 `${imageName}:${serviceTag}-stable`,

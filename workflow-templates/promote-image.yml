@@ -1,0 +1,31 @@
+name: Promote Image
+run-name: Promote ${{ inputs.tag }} to ${{ inputs.cluster }}
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        required: true
+        description: The tag to promote
+      cluster:
+        type: string
+        required: true
+        description: >
+          The cluster to which to promote the image. For possible values, see the `clusters`
+          variable in `actions/common/config.mjs`. Each of the keys is a possible value
+          (case-insensitive). There are, additionally, two special values `__acc` and `__prd`,
+          which promote to all acc and all prd clusters, respectively
+      user:
+        type: string
+        default: ${{ github.actor }}
+        required: true
+        description: The user promoting the image
+jobs:
+  promote-image:
+    name: Promote Image
+    uses: icemobilelab/github-actions-pipeline/.github/workflows/reusable-promote-image.yml@v1
+    secrets: inherit
+    with:
+      tag: ${{ inputs.tag }}
+      cluster: ${{ inputs.cluster }}
+      user: ${{ inputs.user }}
