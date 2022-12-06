@@ -23,13 +23,10 @@ async function logIntoAzureCr() {
     ], {
         input: Buffer.from(credentials.password),
     });
-
-    return credentials.username;
 }
 
 async function logIntoClusterImageRegistry(cluster) {
-    const { stdout } = await oc.command('whoami', ['--token']);
-    const token = stdout.trim();
+    const token = process.env['ARO_TST_AUTH_TOKEN'];
     const username = '_unsused_';
     const clusterRegistry = `default-route-openshift-image-registry.apps.${cluster.hostname}`;
     await exec('skopeo', [
@@ -40,16 +37,15 @@ async function logIntoClusterImageRegistry(cluster) {
     ], {
         input: Buffer.from(token),
     });
-
-    return username;
 }
 
 async function getAzureCRCredentials() {
     const [secret] = await oc.get('secret', AZURE_CR_SECRET, [
-        '--namespace', BUILD_NAMESPACE
+        '--namespace', BUILD_NAMESPACE,
+        ...getClusterAuthParams(clusters.tst),
     ]);
 
-    const dockerConfigJson = Buffer.from(secret[DOCKER_CONFIG_KEY], 'base64');
+    const dockerConfigJson = Buffer.from(secret.data[DOCKER_CONFIG_KEY], 'base64');
     const dockerConfig = JSON.parse(dockerConfigJson.toString());
     const {
         username,
@@ -66,14 +62,14 @@ function getClusterAuthParams(cluster) {
     const apiUrl = new URL(`https://api.${cluster.hostname}`);
     apiUrl.port = 6443;
     return [
-        '--server', `${apiUrl.toString()}`,
+        '--server', `${apiUrl.origin}`,
         '--token', process.env[`ARO_${cluster.clusterId}_AUTH_TOKEN`],
     ];
 }
 
 async function promote(project, tag, user, destinationClusters) {
-    const azureCrUser = await logIntoAzureCr();
-    const tstRegistryUser = await logIntoClusterImageRegistry(clusters.tst);
+    await logIntoAzureCr();
+    await logIntoClusterImageRegistry(clusters.tst);
     const image = `${project}:${tag}`;
     const { stdout } = await exec('date', [], {
         env: {
@@ -89,8 +85,6 @@ async function promote(project, tag, user, destinationClusters) {
                 'copy',
                 `docker://${TST_IMAGE_REGISTRY}/${TST_IMAGE_NAMESPACE}/${image}`,
                 `docker://${azureCrImage}`,
-                `--src-creds=${tstRegistryUser}`,
-                `--dest-creds=${azureCrUser}`,
             ]);
 
             core.info('Verifying that image is available in Azure CR...');
@@ -98,8 +92,7 @@ async function promote(project, tag, user, destinationClusters) {
                 try {
                     await exec('skopeo', [
                         'inspect',
-                        azureCrImage,
-                        `--creds=${azureCrUser}`,
+                        `docker://${azureCrImage}`,
                     ], { silent: true });
 
                     break;
@@ -140,7 +133,9 @@ async function promote(project, tag, user, destinationClusters) {
             await oc.command('annotate', [
                 `istag/${image}`,
                 `promotion.to.${cluster.env.toUpperCase()}.by="${user} on ${promotionDate}"`,
-                '--overwrite=true'
+                '--overwrite=true',
+                '--namespace', cluster.defaultNamespace,
+                ...clusterAuthParams,
             ]);
         });
     }
@@ -153,6 +148,9 @@ async function run() {
     const user = core.getInput('user', { required: true, }).toLowerCase();
 
     const destinationClusters = [];
+    if (cluster === 'tst') {
+        throw new Error('Can\'t promote files to TST');
+    }
     if (cluster.startsWith('__')) {
         const env = cluster.replace('__', '');
         destinationClusters.push(
