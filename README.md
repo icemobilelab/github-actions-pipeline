@@ -129,4 +129,3 @@ Notice the last line. By default, the build script will output a single `index.[
 [gha_nodejs]: https://docs.github.com/en/actions/creating-actions/creating-a-javascript-action#commit-tag-and-push-your-action-to-github
 [ncc]: https://www.npmjs.com/package/@vercel/ncc
 [esbuild]: https://esbuild.github.io/
-# Free AI at api.airforce
